@@ -8,10 +8,10 @@ using TestingFramework.Testing;
 
 namespace TestingFramework.AlgoIntegration
 {
-    public partial class BRITSAlgorithm : Algorithm
+    public partial class BRITS2Algorithm : Algorithm
     {
         private static bool _init = false;
-        public BRITSAlgorithm() : base(ref _init)
+        public BRITS2Algorithm() : base(ref _init)
         { }
 
         public override string[] EnumerateInputFiles(string dataCode, int tcase)
@@ -19,7 +19,7 @@ namespace TestingFramework.AlgoIntegration
             return new[] { $"{dataCode}_m{tcase}.txt" };
         }
         
-        private static string Style => "linespoints lt 8 dt 1 lw 2 pt 1 lc rgbcolor \"blue\" pointsize 1.2";
+        private static string Style => "linespoints lt 8 dt 5 lw 2 pt 8 lc rgbcolor \"green\" pointsize 1.2";
 
         public override IEnumerable<SubAlgorithm> EnumerateSubAlgorithms()
         {
@@ -49,6 +49,7 @@ namespace TestingFramework.AlgoIntegration
             
             string functionArgs = $"--input \"{SubFolderDataIn}{data.Code}_m{len}.txt\" --output \"{SubFolderDataOut}{AlgCode}{len}.txt\"";
             proc.StartInfo.Arguments = $"main.py --epochs {Epochs} --batch_size 64 --model brits_i_univ {functionArgs}";
+            // proc.StartInfo.Arguments = $"main.py --epochs {Epochs} --batch_size 64 --model brits {functionArgs}";
 
             return proc;
         }
@@ -65,6 +66,7 @@ namespace TestingFramework.AlgoIntegration
             
             string functionArgs = $"--input \"{SubFolderDataIn}{data.Code}_m{len}.txt\" --output \"{SubFolderDataOut}{AlgCode}{len}.txt\"";
             proc.StartInfo.Arguments = $"main.py --epochs {Epochs} --batch_size 64 --model brits_i_univ {functionArgs} --runtime 1";
+            // proc.StartInfo.Arguments = $"main.py --epochs {Epochs} --batch_size 64 --model brits {functionArgs} --runtime 1";
 
             return proc;
         }

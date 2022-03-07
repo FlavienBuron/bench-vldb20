@@ -32,11 +32,13 @@ namespace TestingFramework.AlgoIntegration
         public static readonly Algorithm LinImp = new LinearImputeAlgorithm();
         
         public static readonly Algorithm MvExport = new MissingValueExportAlgorithm();
+        public static readonly Algorithm Lstm = new LSTMAlgorithm();
+        public static readonly Algorithm DeepMvi = new DeepMVIAlgorithm();
 
         //example:
         //    public static readonly Algorithm Example = new ExampleAlgorithm();
         
-        public static Algorithm[] ListAlgorithms = { Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa, Mrnn, Brits };
+        public static Algorithm[] ListAlgorithms = { Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa, Mrnn, Brits, Lstm, DeepMvi };
         public static Algorithm[] ListAlgorithmsMulticolumn = null;
 
         public const int TypicalTruncation = 3;
@@ -245,6 +247,23 @@ namespace TestingFramework.AlgoIntegration
     {
         public override string AlgCode => "linimp";
         protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}cpp/_data/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class LSTMAlgorithm
+    {
+        public override string AlgCode => "lstm";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/LSTM/";
+        protected override string SubFolderDataIn => "data/in/";
+        protected override string SubFolderDataOut => "data/out/";
+    }
+
+    public partial class DeepMVIAlgorithm
+    {
+        public override string AlgCode => "deepmvi";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/DeepMVI/";
         protected override string SubFolderDataIn => "in/";
         protected override string SubFolderDataOut => "out/";
         public override bool IsMultiColumn => true;

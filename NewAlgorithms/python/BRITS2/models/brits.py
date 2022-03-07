@@ -1,12 +1,22 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 
 from torch.autograd import Variable
+from torch.nn.parameter import Parameter
 
-import rits_i
+import math
+import utils
+import argparse
+import data_loader
+
+import rits
 from sklearn import metrics
 
-SEQ_LEN = 36
+from ipdb import set_trace
+
+SEQ_LEN = 48
 RNN_HID_SIZE = 64
 
 
@@ -16,8 +26,8 @@ class Model(nn.Module):
         self.build()
 
     def build(self):
-        self.rits_f = rits_i.Model()
-        self.rits_b = rits_i.Model()
+        self.rits_f = rits.Model()
+        self.rits_b = rits.Model()
 
     def forward(self, data):
         ret_f = self.rits_f(data, 'forward')
