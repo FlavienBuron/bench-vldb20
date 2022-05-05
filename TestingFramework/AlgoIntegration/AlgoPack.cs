@@ -30,15 +30,21 @@ namespace TestingFramework.AlgoIntegration
         public static readonly Algorithm SvdI = new SVDImputeAlgorithm();
         public static readonly Algorithm MeanImp = new MeanImputeAlgorithm();
         public static readonly Algorithm LinImp = new LinearImputeAlgorithm();
-        
         public static readonly Algorithm MvExport = new MissingValueExportAlgorithm();
         public static readonly Algorithm Lstm = new LSTMAlgorithm();
         public static readonly Algorithm DeepMvi = new DeepMVIAlgorithm();
+        public static readonly Algorithm Gain = new GAINAlgorithm();
+        public static readonly Algorithm E2egan = new E2EGANAlgorithm();
+        public static readonly Algorithm Wgan = new WGANAlgorithm();
+        public static readonly Algorithm pgan = new pGANAlgorithm();
+        public static readonly Algorithm Naomi = new NAOMIAlgorithm();
 
         //example:
         //    public static readonly Algorithm Example = new ExampleAlgorithm();
         
-        public static Algorithm[] ListAlgorithms = { Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa, Mrnn, Brits, Lstm, DeepMvi };
+        public static Algorithm[] ListAlgorithms = {
+            Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa,
+            Mrnn, Brits, Lstm, DeepMvi, Gain, E2egan, Wgan, pgan, Naomi };
         public static Algorithm[] ListAlgorithmsMulticolumn = null;
 
         public const int TypicalTruncation = 3;
@@ -222,6 +228,7 @@ namespace TestingFramework.AlgoIntegration
         protected override string _EnvPath => $"{AlgoPack.GlobalAlgorithmsLocation}OtherAlgorithms/BRITS/";
         protected override string SubFolderDataIn => "data/in/";
         protected override string SubFolderDataOut => "data/out/";
+        public override bool IsMultiColumn => true;
         public int Epochs = 100;
     }
 
@@ -258,12 +265,58 @@ namespace TestingFramework.AlgoIntegration
         protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/LSTM/";
         protected override string SubFolderDataIn => "data/in/";
         protected override string SubFolderDataOut => "data/out/";
+        public override bool IsMultiColumn => true;
     }
 
     public partial class DeepMVIAlgorithm
     {
         public override string AlgCode => "deepmvi";
         protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/DeepMVI/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class GAINAlgorithm
+    {
+        public override string AlgCode => "gain";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/GAIN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class E2EGANAlgorithm
+    {
+        public override string AlgCode => "e2egan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/E2EGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class WGANAlgorithm
+    {
+        public override string AlgCode => "wgan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/E2EGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class pGANAlgorithm
+    {
+        public override string AlgCode => "pgan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/pGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class NAOMIAlgorithm
+    {
+        public override string AlgCode => "naomi";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/NAOMI/";
         protected override string SubFolderDataIn => "in/";
         protected override string SubFolderDataOut => "out/";
         public override bool IsMultiColumn => true;

@@ -32,6 +32,7 @@ def Data_Loader_Incomplete(seq_length, filename):
     #%% Parameters
     col_no = len(x[0,:])
     row_no = len(x[:,0]) - seq_length
+    print "col_no={}, row_no={}".format(col_no, row_no)
     
     # Dataset build
     dataX = []
@@ -92,7 +93,7 @@ def Data_Loader_Incomplete(seq_length, filename):
                 
     #%% Train / Test Division   
     #train_size = int(len(dataX) * train_rate)
-
+    print train_size
     trainX, testX = np.array(dataX[0:train_size]), np.array(dataX[train_size:len(dataX)])
     trainZ, testZ = np.array(dataZ[0:train_size]), np.array(dataZ[train_size:len(dataX)])
     trainM, testM = np.array(dataM[0:train_size]), np.array(dataM[train_size:len(dataX)])

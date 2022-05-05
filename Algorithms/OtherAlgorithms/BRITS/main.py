@@ -68,7 +68,7 @@ def evaluate(model, val_iter):
 
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
-    n = len(matrix)
+    n, m = matrix.shape
     prepare_dat(input, input + ".tmp")
 
     start = time.time()
@@ -84,10 +84,10 @@ def run(input, output, rt = 0):
     if rt > 0:
         np.savetxt(output, np.array([(end - start) * 1000 * 1000]))
     else:
-        res = res[0,:n]
-        res = res.reshape(n)
-        matrix[:, 0] = res
-        np.savetxt(output, matrix)
+        # res = res[0,:n]
+        res = res.reshape(matrix.shape)
+        # matrix[:, 0] = res
+        np.savetxt(output, res)
     #end if
 
     print ''
