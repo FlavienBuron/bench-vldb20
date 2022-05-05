@@ -81,6 +81,11 @@
     <Compile Include="AlgoIntegration\LinearImputeAlgorithm.cs" />
     <Compile Include="AlgoIntegration\LSTMAlgorithm.cs" />
     <Compile Include="AlgoIntegration\DeepMVIAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\GAINAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\E2EGANAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\WGANAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\pGANAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\NAOMIAlgorithm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Testing\DataWorks.cs" />

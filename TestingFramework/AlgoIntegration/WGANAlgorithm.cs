@@ -8,10 +8,10 @@ using TestingFramework.Testing;
 
 namespace TestingFramework.AlgoIntegration
 {
-    public partial class DeepMVIAlgorithm : Algorithm
+    public partial class WGANAlgorithm : Algorithm
     {
         private static bool _init = false;
-        public DeepMVIAlgorithm() : base(ref _init)
+        public WGANAlgorithm() : base(ref _init)
         { }
 
         public override string[] EnumerateInputFiles(string dataCode, int tcase)
@@ -19,7 +19,7 @@ namespace TestingFramework.AlgoIntegration
             return new[] { $"{dataCode}_m{tcase}.txt" };
         }
         
-        private static string Style => "linespoints lt 8 dt 1 lw 2 pt 1 lc rgbcolor \"dark-red\" pointsize 1.2";
+        private static string Style => "linespoints lt 8 dt 1 lw 2 pt 1 lc rgbcolor \"orange\" pointsize 1.2";
 
         public override IEnumerable<SubAlgorithm> EnumerateSubAlgorithms()
         {
@@ -48,7 +48,7 @@ namespace TestingFramework.AlgoIntegration
             proc.StartInfo.UseShellExecute = false;
             
             string functionArgs = $"--input \"{SubFolderDataIn}{data.Code}_m{len}.txt\" --output \"{SubFolderDataOut}{AlgCode}{len}.txt\"";
-            proc.StartInfo.Arguments = $" recovery.py {functionArgs}";
+            proc.StartInfo.Arguments = $"main.py {functionArgs}";
 
             return proc;
         }
@@ -64,7 +64,7 @@ namespace TestingFramework.AlgoIntegration
             proc.StartInfo.UseShellExecute = false;
             
             string functionArgs = $"--input \"{SubFolderDataIn}{data.Code}_m{len}.txt\" --output \"{SubFolderDataOut}{AlgCode}{len}.txt\"";
-            proc.StartInfo.Arguments = $"recovery.py {functionArgs} --runtime 1";
+            proc.StartInfo.Arguments = $"main.py {functionArgs} --runtime 1";
 
             return proc;
         }
@@ -76,7 +76,7 @@ namespace TestingFramework.AlgoIntegration
             if (proc.ExitCode != 0)
             {
                 string errText =
-                    $"[WARNING] DeepMVI returned code {proc.ExitCode} on exit.{Environment.NewLine}" +
+                    $"[WARNING] WGAN returned code {proc.ExitCode} on exit.{Environment.NewLine}" +
                     $"CLI args: {proc.StartInfo.Arguments}";
                 
                 Console.WriteLine(errText);
