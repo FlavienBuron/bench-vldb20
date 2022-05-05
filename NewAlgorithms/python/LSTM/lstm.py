@@ -40,7 +40,7 @@ class LSTM(nn.Module):
 
             # estimate x_h(t) based on previous output h(t-1)
             x_h = self.regression(h)
-            # establish complement depending if value is missing, then use x_h(t)
+            # establish complement depending on if value is missing, then use x_h(t)
             x_c =  m * x +  (1 - m) * x_h
 
             x_loss += torch.sum(torch.abs(x - x_h) * m) / (torch.sum(m) + 1e-5)
