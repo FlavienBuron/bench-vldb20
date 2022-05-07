@@ -62,10 +62,3 @@ def data_prep(input, output):
 
         rec = json.dumps(rec)
         file.write(rec + '\n')
-
-if __name__ == "__main__":
-    out = open("./data/in/chlorine_normal.json", "w")
-    data = pd.read_csv("./data/in/chlorine_normal.txt", header=None, delimiter=" ")
-    for col in range(data.shape[1]):
-        data_prep(data[col].tolist(), col, out)
-    out.close()

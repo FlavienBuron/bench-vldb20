@@ -10,7 +10,7 @@ import data_loader
 import utils
 import lstm
 
-BATCH_SIZE = 8
+# BATCH_SIZE = 8
 EPOCHS = 100
 
 parser = argparse.ArgumentParser()
@@ -20,9 +20,9 @@ parser.add_argument('--runtime', type = int, default = 0)
 args = parser.parse_args()
 
 
-def train(model, input):
+def train(model, input, batch_size=8):
     optimizer = optim.Adam(model.parameters(), lr = 1e-3)
-    data_iter = data_loader.get_loader(input, batch_size=BATCH_SIZE)
+    data_iter = data_loader.get_loader(input, batch_size=batch_size)
 
     for epoch in range(EPOCHS):
         model.train()
@@ -47,35 +47,25 @@ def evaluate(model, val_iter):
     model.eval()
 
     imputations = []
-    imputations2 = []
-    evals = []
 
     for _, data in enumerate(val_iter):
         data = utils.to_var(data)
         ret = model.run_on_batch(data, None)
-        # eval_masks = ret['eval_masks'].data.cpu().numpy()
-        # eval_ = ret['evals'].data.cpu().numpy()
+
         imputation = ret['imputations'].data.cpu().numpy()
         imputations += imputation.tolist()
-        # imputations2 += imputation[np.where(eval_masks == 1)].tolist()
-        # evals += eval_[np.where(eval_masks == 1)].tolist()
     #end for
-    # evals = np.asarray(evals)
+
     imputations = np.asarray(imputations)
-
-    # mae = np.abs(evals - imputations2).mean()
-    # mre = np.abs(evals - imputations2).sum() / np.abs(evals).sum()
-
-    # print 'MAE', mae
-    # print 'MRE', mre
 
     return imputations
 #end func
 
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
-    n = len(matrix)
-    # n = 1000
+    n, m = matrix.shape
+    batch_size = m//10
+    print 'Batch size: {}'.format(batch_size)
     data_prep(input, input + ".tmp")
 
     start = time.time()
@@ -84,7 +74,7 @@ def run(input, output, rt = 0):
     if torch.cuda.is_available():
         model = model.cuda()
 
-    (model, data_iter) = train(model, input + ".tmp")
+    (model, data_iter) = train(model, input + ".tmp", batch_size)
     res = evaluate(model, data_iter)
     end = time.time()
 

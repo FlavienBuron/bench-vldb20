@@ -59,6 +59,9 @@ def main():
     input_matrix = np.loadtxt(args.input)
     row, col = input_matrix.shape
     args.shape = (row, col)
+    batch_size = col // 10
+    args.batch_size = batch_size
+    print(f'Batch size: {batch_size}')
 
     epochs=[args.epoch]
     g_loss_lambdas=[args.g_loss_lambda]

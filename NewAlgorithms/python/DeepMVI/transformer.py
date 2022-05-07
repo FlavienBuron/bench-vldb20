@@ -121,6 +121,8 @@ def transformer_recovery(input_feats):
     print ('Use Local Attention : ',use_local)
 
     batch_size = min(input_feats.shape[1]*int(input_feats.shape[0]/time_context),16)
+    batch_size = input_feats.shape[1]//10
+    print('Batch size: ', batch_size)
     interval = 1000
        
     train_set = myDataset(train_feats,use_local,time_context = time_context)

@@ -21,7 +21,7 @@ def main():
     # parse arguments
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--gpus', type=str, default = None)
-    parser.add_argument('--batch-size', type=int, default=5)
+    parser.add_argument('--batch_size', type=int, default=5)
     parser.add_argument('--gen-length', type=int, default=96)
     parser.add_argument('--impute-iter', type=int, default=400)
     parser.add_argument('--pretrain-epoch', type=int, default=5)
@@ -71,6 +71,9 @@ def main():
     input_matrix = np.loadtxt(args.input)
     row, col = input_matrix.shape
     args.shape = (row, col)
+    batch_size = col//10
+    args.batch_size = batch_size
+    print(f'Batch size: {batch_size}')
 
     epochs=[args.epoch]
     g_loss_lambdas=[args.g_loss_lambda]

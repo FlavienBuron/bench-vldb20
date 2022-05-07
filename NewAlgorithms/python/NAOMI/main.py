@@ -142,6 +142,7 @@ def pretrain(policy_net, train_data, pretrain_epochs, lr, teacher_forcing=True):
 def run():
     train_data = torch.Tensor(np.loadtxt(args.input).T).unsqueeze(2)
     args.batch_size = train_data.shape[0] // 10
+    print(f'Batch size: {args.batch_size}')
 
     params = {
         'batch': args.batch_size,

@@ -243,7 +243,7 @@ class DataLoader():
             else:
                 yield  x,y,mean,m,deltaPre,x_lengths,lastvalues,files,imputed_deltapre,imputed_m,deltaSub,subvalues,imputed_deltasub
 
-    def shuffle(self,batchSize=32,isShuffle=False):
+    def shuffle(self,batchSize=5,isShuffle=False):
         self.batchSize=batchSize
         if isShuffle:
             c = list(zip(self.x,self.y,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues))
