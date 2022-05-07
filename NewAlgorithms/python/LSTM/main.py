@@ -91,10 +91,10 @@ def run(input, output, rt = 0):
     if rt > 0:
         np.savetxt(output, np.array([(end - start) * 1000 * 1000]))
     else:
-        # res = res[0,:n]
-        res = res.reshape(matrix.shape)
-        # matrix[:, 0] = res
-        np.savetxt(output, res)
+        for i in range(0, len(res)):
+            res_l = res[i, :n];
+            matrix[:, i] = res_l.reshape(n);
+        np.savetxt(output, matrix)
 
     print ''
     print 'Time (LSTM):', ((end - start) * 1000 * 1000)
