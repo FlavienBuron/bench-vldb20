@@ -69,6 +69,8 @@ def evaluate(model, val_iter):
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
     n, m = matrix.shape
+    args.batch_size=m//10
+    print 'Batch size: {}'.format(args.batch_size)
     prepare_dat(input, input + ".tmp")
 
     start = time.time()
