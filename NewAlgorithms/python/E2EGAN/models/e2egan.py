@@ -6,10 +6,10 @@ import time
 import tensorflow as tf
 import numpy as np
 import random
-from ops import *
-from utils import *
+from .ops import *
+from .utils import *
 from tensorflow.python.ops import math_ops
-import mygru_cell
+from .mygru_cell import MyGRUCell15
 SEED = 1
 os.environ['PYTHONHASHSEED'] = str(SEED)
 random.seed(SEED)
@@ -58,9 +58,9 @@ class E2EGAN(object):
         self.learning_rate = args.lr
         self.beta1 = args.beta1
         if "1.5" in tf.__version__ or "1.7" in tf.__version__ :
-            self.grui_cell_g1 = mygru_cell.MyGRUCell15(self.n_hidden_units)
-            self.grui_cell_g2 = mygru_cell.MyGRUCell15(self.n_hidden_units)
-            self.grui_cell_d = mygru_cell.MyGRUCell15(self.n_hidden_units)
+            self.grui_cell_g1 = MyGRUCell15(self.n_hidden_units)
+            self.grui_cell_g2 = MyGRUCell15(self.n_hidden_units)
+            self.grui_cell_d = MyGRUCell15(self.n_hidden_units)
         elif "1.4" in tf.__version__:
             self.grui_cell_g1 = mygru_cell.MyGRUCell4(self.n_hidden_units)
             self.grui_cell_g2 = mygru_cell.MyGRUCell4(self.n_hidden_units)
