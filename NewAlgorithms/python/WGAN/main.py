@@ -1,4 +1,7 @@
 from __future__ import print_function
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 import models.WGAN_GRUI as WGAN_GRUI
 import tensorflow as tf
@@ -73,7 +76,7 @@ def main():
                 args.beta1 = beta1
                 args.g_loss_lambda=g_l
                 tf.reset_default_graph()
-                dt_train=DataLoader(input_matrix[0:200, :])
+                dt_train=DataLoader(input_matrix)
                 # dt_test=readTestData.ReadPhysionetData(os.path.join(args.data_path,"test"), os.path.join(args.data_path,"test","list.txt"),dt_train.maxLength,isNormal=args.isNormal,isSlicing=args.isSlicing)
                 tf.reset_default_graph()
                 config = tf.ConfigProto() 

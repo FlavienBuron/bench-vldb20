@@ -298,7 +298,7 @@ namespace TestingFramework.AlgoIntegration
     public partial class WGANAlgorithm
     {
         public override string AlgCode => "wgan";
-        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/E2EGAN/";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/WGAN/";
         protected override string SubFolderDataIn => "in/";
         protected override string SubFolderDataOut => "out/";
         public override bool IsMultiColumn => true;

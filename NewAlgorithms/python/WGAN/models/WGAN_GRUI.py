@@ -6,9 +6,9 @@ import time
 import tensorflow as tf
 import numpy as np
 from tensorflow.python.ops import math_ops
-from ops import *
-from utils import *
-import mygru_cell
+from .ops import *
+from .utils import *
+from .mygru_cell import MyGRUCell15
 
 """
 D输入标准化， 不要m 填充0
@@ -55,8 +55,8 @@ class WGAN(object):
         self.learning_rate = args.lr
         self.beta1 = args.beta1
         if "1.5" in tf.__version__ or "1.7" in tf.__version__ :
-            self.grud_cell_d = mygru_cell.MyGRUCell15(self.n_hidden_units)
-            self.grud_cell_g = mygru_cell.MyGRUCell15(self.n_hidden_units)
+            self.grud_cell_d = MyGRUCell15(self.n_hidden_units)
+            self.grud_cell_g = MyGRUCell15(self.n_hidden_units)
         elif "1.4" in tf.__version__:
             self.grud_cell_d = mygru_cell.MyGRUCell4(self.n_hidden_units)
             self.grud_cell_g = mygru_cell.MyGRUCell4(self.n_hidden_units)
