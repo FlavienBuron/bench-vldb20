@@ -88,7 +88,6 @@ def adversarial_training(policy_net, discrim_net, train_data, pretrain_disc_iter
             break
 
     for i_iter in range(max_iter_num):
-        print(f'{i_iter=}')
         ts0 = time.time()
         exp_states, exp_actions, exp_seq, model_states_var, model_actions_var, model_seq, mod_stats, exp_stats = \
             collect_samples_interpolate(policy_net, train_data, use_gpu, i_iter, size=args.batch_size, draw=False, stats=False)
@@ -142,7 +141,6 @@ def pretrain(policy_net, train_data, pretrain_epochs, lr, teacher_forcing=True):
 def run():
     train_data = torch.Tensor(np.loadtxt(args.input).T).unsqueeze(2)
     args.batch_size = train_data.shape[0] // 10
-    print(f'Batch size: {args.batch_size}')
 
     params = {
         'batch': args.batch_size,

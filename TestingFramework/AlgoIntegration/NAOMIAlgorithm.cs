@@ -42,7 +42,7 @@ namespace TestingFramework.AlgoIntegration
             Process proc = new Process();
             
             proc.StartInfo.WorkingDirectory = EnvPath;
-            proc.StartInfo.FileName = "python3";
+            proc.StartInfo.FileName = "python3.6";
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             proc.StartInfo.UseShellExecute = false;
@@ -58,7 +58,7 @@ namespace TestingFramework.AlgoIntegration
             Process proc = new Process();
             
             proc.StartInfo.WorkingDirectory = EnvPath;
-            proc.StartInfo.FileName = "python3";
+            proc.StartInfo.FileName = "python3.6";
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             proc.StartInfo.UseShellExecute = false;

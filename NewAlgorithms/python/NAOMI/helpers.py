@@ -2,15 +2,6 @@ from torch.autograd import Variable
 from torch import nn
 import torch
 import numpy as np
-import os
-import struct
-import pickle
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib import animation
-from skimage.transform import resize
 
 use_gpu = torch.cuda.is_available()
 
@@ -181,14 +172,6 @@ def draw_and_stats(model_states, name, i_iter, task, compute_stats=True, draw=Tr
         stats['ave_out_of_bound'] = np.mean((val_data < -0.51) + (val_data > 0.51))
         # stats['ave_player_distance'] = np.mean(ave_player_distance(val_data))
         # stats['diff_max_min'] = np.mean(np.max(val_seqlength, axis=1) - np.min(val_seqlength, axis=1))
-    
-    if draw:
-        print("Drawing")
-        draw_data = model_states.cpu().numpy()[:, 0, :] 
-        draw_data = unnormalize(draw_data, task)
-        colormap = ['b', 'r', 'g', 'm', 'y']
-        plot_sequence(draw_data, task, colormap=colormap, \
-                      save_name="imgs/{}_{}".format(name, i_iter), missing_list=missing_list)
 
     return stats
 
@@ -203,72 +186,3 @@ def unnormalize(x, task):
         NORMALIZE = [128, 128] * int(dim / 2)
         SHIFT = [1] * dim
         return np.multiply(x + SHIFT, NORMALIZE)
-
-def _set_figax(task):
-    fig = plt.figure(figsize=(5,5))
-    
-    if task == 'basketball':
-        img = plt.imread('data/court.png')
-        img = resize(img,(500,940,3))
-        ax = fig.add_subplot(111)
-        ax.imshow(img)
-    
-        # show just the left half-court
-        ax.set_xlim([-50,550])
-        ax.set_ylim([-50,550])
-        
-    else:
-        img = plt.imread('data/world.jpg')
-        img = resize(img,(256,256,3))
-    
-        ax = fig.add_subplot(111)
-        ax.imshow(img)
-    
-        ax.set_xlim([-50,300])
-        ax.set_ylim([-50,300])
-
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-    return fig, ax
-
-def plot_sequence(seq, task, colormap, save_name='', missing_list=None):
-    n_players = int(len(seq[0])/2)
-
-    while len(colormap) < n_players:
-        colormap += 'b'
-
-    fig, ax = _set_figax(task)
-    if task == 'basketball':
-        SCALE = 10
-    else:
-        SCALE = 1
-
-    for k in range(n_players):
-        x = seq[:,(2*k)]
-        y = seq[:,(2*k+1)]
-        color = colormap[k]
-        ax.plot(SCALE*x, SCALE*y, color=color, linewidth=3, alpha=0.7)
-        ax.plot(SCALE*x, SCALE*y, 'o', color=color, markersize=8, alpha=0.5)
-
-    # starting positions
-    x = seq[0,::2]
-    y = seq[0,1::2]
-    ax.plot(SCALE*x, SCALE*y, 'o', color='black', markersize=12)
-
-    if missing_list is not None:
-        missing_list = missing_list.numpy()
-        for i in range(seq.shape[0]):
-            if i not in missing_list:
-                x = seq[i,::2]
-                y = seq[i,1::2]
-                ax.plot(SCALE*x, SCALE*y, 'o', color='black', markersize=8)
-
-    plt.tight_layout(pad=0)
-
-    if len(save_name) > 0:
-        plt.savefig(save_name+'.png')
-    else:
-        plt.show()
-    
-    plt.close(fig)
