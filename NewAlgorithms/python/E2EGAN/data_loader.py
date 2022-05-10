@@ -11,8 +11,6 @@ class DataLoader():
         """
         input = matrix representing the dataset (numpy array)
         """
-        fileNames=[]
-        self.fileNames = fileNames
         mean = [0.0]*NB_FEATURES
         meancount = [0]*NB_FEATURES
         x = []
@@ -173,9 +171,7 @@ class DataLoader():
             files = []
 
             for j in range((i-1)*self.batchSize, i*self.batchSize):
-                # files.append(self.fileNames[j])
                 x.append(self.x[j])
-                # y.append(self.y[j])
                 m.append(self.m[j])
                 deltaPre.append(self.deltaPre[j])
                 deltaSub.append(self.deltaSub[j])
@@ -246,7 +242,7 @@ class DataLoader():
     def shuffle(self,batchSize=5,isShuffle=False):
         self.batchSize=batchSize
         if isShuffle:
-            c = list(zip(self.x,self.y,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues))
+            c = list(zip(self.x,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.times,self.deltaSub,self.subvalues))
             random.shuffle(c)
-            self.x,self.y,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues=zip(*c)
+            self.x,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues=zip(*c)
             print("shuffled")
