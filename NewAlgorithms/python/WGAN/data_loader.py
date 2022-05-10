@@ -11,10 +11,6 @@ class DataLoader():
         """
         input = matrix representing the dataset (numpy array)
         """
-        fileNames=[]
-        
-        row, col = input.shape
-
         mean = [0.0]*NB_FEATURES
         meancount = [0]*NB_FEATURES
         x = []
@@ -22,7 +18,6 @@ class DataLoader():
 
         for ts in input.transpose():
             # transpose input so each timeseries are rows
-
             t = 0
             totalData = []
             t_times = []
@@ -136,66 +131,6 @@ class DataLoader():
             deltaSub.append(ts_deltaSub)
             subvalues.append(ts_subvalues)
 
-        # slice_start = 0
-        # slice_end = INPUT_LENGTH
-        # first_ts = True
-
-        # sliced_x = []
-        # sliced_m = []
-        # sliced_times = []
-        # sliced_lengths = []
-        # sliced_deltaPre = []
-        # sliced_lastvalues = []
-        # sliced_deltaSub = []
-        # sliced_subvalues = []
-
-        # x_arr = np.array(x)
-        # m_arr = np.array(m)
-        # times_arr = np.array(times)
-        # x_lengths_arr = np.array(x_lengths)
-        # deltaPre_arr = np.array(deltaPre)
-        # lastvalues_arr =  np.array(lastvalues)
-        # deltaSub_arr = np.array(deltaSub)
-        # subvalues_arr = np.array(subvalues)
-
-
-        # for ts in range(x_arr.shape[0]):
-        #     while slice_start < max(x_lengths):
-        #         if slice_end > max(x_lengths):
-        #             slice_end = max(x_lengths)
-
-        #         if first_ts:
-        #             x_slice = np.expand_dims(x_arr[ts, slice_start:slice_end], axis=0)
-        #             sliced_lengths.append(x_slice.shape[1])
-
-        #             sliced_x = (x_slice)
-        #             sliced_times = np.expand_dims(times_arr[ts , slice_start:slice_end], axis=0)
-        #             sliced_m = np.expand_dims(m_arr[ts, slice_start:slice_end], axis=0)
-        #             sliced_deltaPre = np.expand_dims(deltaPre_arr[ts, slice_start:slice_end], axis=0)
-        #             sliced_lastvalues = np.expand_dims(lastvalues_arr[ts, slice_start:slice_end], axis=0)
-        #             sliced_deltaSub = np.expand_dims(deltaSub_arr[ts, slice_start:slice_end], axis=0)
-        #             sliced_subvalues = np.expand_dims(subvalues_arr[ts, slice_start:slice_end], axis=0)
-        #             slice_start = slice_end
-        #             slice_end += INPUT_LENGTH
-        #             first_ts = False
-
-        #         x_slice = np.expand_dims(x_arr[ts, slice_start:slice_end], axis=0)
-        #         sliced_lengths.append(x_slice.shape[1])
-
-        #         sliced_x = np.concatenate((sliced_x, x_slice), axis=0)
-        #         sliced_times = np.concatenate((sliced_times, np.expand_dims(times_arr[ts, slice_start:slice_end], axis=0)), axis=0)
-        #         sliced_m = np.concatenate((sliced_m, np.expand_dims(m_arr[ts, slice_start:slice_end], axis=0)), axis=0)
-        #         sliced_deltaPre = (np.concatenate((sliced_deltaPre, np.expand_dims(deltaPre_arr[ts, slice_start:slice_end], axis=0)), axis=0))
-        #         sliced_lastvalues = (np.concatenate((sliced_lastvalues, np.expand_dims(lastvalues_arr[ts, slice_start:slice_end], axis=0)), axis=0))
-        #         sliced_deltaSub = (np.concatenate((sliced_deltaSub, np.expand_dims(deltaSub_arr[ts, slice_start:slice_end], axis=0)), axis=0))
-        #         sliced_subvalues = (np.concatenate((sliced_subvalues, np.expand_dims(subvalues_arr[ts, slice_start:slice_end], axis=0)), axis=0))
-
-        #         slice_start = slice_end
-        #         slice_end += INPUT_LENGTH
-        #     slice_start = 0
-        #     slice_end = INPUT_LENGTH
-
-        # sliced_lengths = np.apply_along_axis(lambda x: len(x), 1, sliced_x).squeeze().tolist()
         self.m=m
         self.deltaPre = deltaPre
         self.lastvalues = lastvalues
@@ -237,9 +172,7 @@ class DataLoader():
             files = []
 
             for j in range((i-1)*self.batchSize, i*self.batchSize):
-                # files.append(self.fileNames[j])
                 x.append(self.x[j])
-                # y.append(self.y[j])
                 m.append(self.m[j])
                 deltaPre.append(self.deltaPre[j])
                 deltaSub.append(self.deltaSub[j])
@@ -313,4 +246,3 @@ class DataLoader():
             c = list(zip(self.x,self.y,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues))
             random.shuffle(c)
             self.x,self.y,self.m,self.deltaPre,self.x_lengths,self.lastvalues,self.fileNames,self.times,self.deltaSub,self.subvalues=zip(*c)
-            print("shuffled")

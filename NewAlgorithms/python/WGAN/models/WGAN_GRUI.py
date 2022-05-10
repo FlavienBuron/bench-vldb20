@@ -22,11 +22,6 @@ class WGAN(object):
         self.sess = sess
         self.isbatch_normal=args.isBatch_normal # default True
         self.isNormal=args.isNormal # default True
-        self.checkpoint_dir = args.checkpoint_dir
-        self.result_dir = args.result_dir
-        self.log_dir = args.log_dir
-        self.dataset_name=args.dataset_name # default None
-        self.run_type=args.run_type # default Train
         self.lr = args.lr   #default 1e-3
         self.epoch = args.epoch     #default 30
         self.batch_size = args.batch_size  #default 128
@@ -34,10 +29,6 @@ class WGAN(object):
         self.n_steps = datasets.maxLength                # time steps
         self.n_hidden_units = args.n_hidden_units        # neurons in hidden layer default 64
         self.n_classes = args.n_classes                # MNIST classes (0-9 digits) default 2
-        self.gpus=args.gpus # default None
-        self.run_type=args.run_type
-        self.result_path=args.result_path
-        self.model_path=args.model_path
         self.pretrain_epoch=args.pretrain_epoch # default 5
         self.impute_iter=args.impute_iter # default 400
         self.isSlicing=args.isSlicing # default True
@@ -46,6 +37,8 @@ class WGAN(object):
         self.datasets=datasets
         self.z_dim = args.z_dim         # dimension of noise-vector
         self.gen_length=args.gen_length
+
+        self.shape = args.shape
         
         # WGAN_GP parameter
         self.lambd = 0.25       # The higher value, the more stable, but the slower convergence
@@ -57,12 +50,9 @@ class WGAN(object):
         if "1.5" in tf.__version__ or "1.7" in tf.__version__ :
             self.grud_cell_d = MyGRUCell15(self.n_hidden_units)
             self.grud_cell_g = MyGRUCell15(self.n_hidden_units)
-        elif "1.4" in tf.__version__:
-            self.grud_cell_d = mygru_cell.MyGRUCell4(self.n_hidden_units)
-            self.grud_cell_g = mygru_cell.MyGRUCell4(self.n_hidden_units)
-        elif "1.2" in tf.__version__:
-            self.grud_cell_d = mygru_cell.MyGRUCell2(self.n_hidden_units)
-            self.grud_cell_g = mygru_cell.MyGRUCell2(self.n_hidden_units)
+        else:
+            print("Error: Tensorflow v1.5 or v1.7 needed")
+            exit(1)
         # test
         self.sample_num = 64  # number of generated images to be saved
 
@@ -250,11 +240,7 @@ class WGAN(object):
         self.imputed_m = tf.placeholder(tf.float32, [None, self.n_steps, self.n_inputs])
         self.z = tf.placeholder(tf.float32, [self.batch_size, self.z_dim], name='z')
 
-        
-        
-
         """ Loss Function """
-
         Pre_out=self.pretrainG(self.x, self.m, self.deltaPre,  self.mean,\
                                                       self.lastvalues, self.x_lengths,self.keep_prob, \
                                                       is_training=True, reuse=False)
@@ -315,31 +301,6 @@ class WGAN(object):
         d_vars = [var for var in t_vars if 'd_' in var.name]
         g_vars = [var for var in t_vars if 'g_' in var.name]
         z_vars = [self.z_need_tune]
-        '''
-        print("d vars:")
-        for v in d_vars:
-            print(v.name)
-        print("g vars:")
-        for v in g_vars:
-            print(v.name)
-        print("z vars:")
-        for v in z_vars:
-            print(v.name)
-        '''
-        
-        #don't need normalization because we have adopted the dropout
-        """
-        ld = 0.0
-        for w in d_vars:
-            ld += tf.contrib.layers.l2_regularizer(1e-4)(w)
-        lg = 0.0
-        for w in g_vars:
-            lg += tf.contrib.layers.l2_regularizer(1e-4)(w)
-        
-        self.d_loss+=ld
-        self.g_loss+=lg
-        """
-        
         # optimizers
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
         # this code have used batch normalization, so the upside line should be executed
@@ -395,7 +356,6 @@ class WGAN(object):
             # get batch data
                 self.datasets.shuffle(self.batch_size,True)
                 idx=0
-                #x,y,mean,m,deltaPre,x_lengths,lastvalues,files,imputed_deltapre,imputed_m,deltaSub,subvalues,imputed_deltasub
                 for data_x,data_y,data_mean,data_m,data_deltaPre,data_x_lengths,data_lastvalues,_,imputed_deltapre,imputed_m,deltaSub,subvalues,imputed_deltasub in self.datasets.nextBatch():
                     
                     # pretrain
@@ -412,54 +372,20 @@ class WGAN(object):
                                                               self.imputed_deltapre:imputed_deltapre,
                                                               self.imputed_deltasub:imputed_deltasub,
                                                               self.keep_prob: 0.5})
-                    self.writer.add_summary(summary_str, counter)
-    
-    
                     counter += 1
     
                     # display training status
                     print("Epoch: [%2d] [%4d/%4d] time: %4.4f, pretrain_loss: %.8f" \
-                          % (epoch, idx, self.num_batches, time.time() - start_time, p_loss))
+                          % (epoch, idx, self.num_batches, time.time() - start_time, p_loss), end='\r')
                     idx+=1
-                # After an epoch, start_batch_id is set to zero
-                # non-zero value is only for the first epoch after loading pre-trained model
-                start_batch_id = 0
-
-                # save model
-                #调好之后再保存
-                #if epoch%10==0:
-                #    self.save(self.checkpoint_dir, counter)
 
 
     def train(self):
 
-        # graph inputs for visualize training results
-        self.sample_z = np.random.standard_normal(size=(self.batch_size , self.z_dim))
-
-        # saver to save model
-        self.saver = tf.train.Saver()
-
-        # summary writer
-        self.writer = tf.summary.FileWriter(self.log_dir + '/' + self.model_name+'/'+self.model_dir)
-
-        # restore check-point if it exits
-        could_load, checkpoint_counter = self.load(self.checkpoint_dir)
-        if could_load:
-            start_epoch = (int)(checkpoint_counter / self.num_batches)
-            #start_batch_id = checkpoint_counter - start_epoch * self.num_batches
-            start_batch_id=0
-            #counter = checkpoint_counter
-            counter=start_epoch*self.num_batches
-            print(" [*] Load SUCCESS")
-            return 
-        else:
-            # initialize all variables
-            tf.global_variables_initializer().run()
-            start_epoch = 0
-            start_batch_id = 0
-            counter = 1
-            print(" [!] Load failed...")
-
+        tf.global_variables_initializer().run()
+        start_epoch = 0
+        start_batch_id = 0
+        counter = 1
         # loop for epoch
         start_time = time.time()
         
@@ -491,7 +417,6 @@ class WGAN(object):
                                                           self.imputed_deltapre:imputed_deltapre,
                                                           self.imputed_deltasub:imputed_deltasub,
                                                           self.keep_prob: 0.5})
-                self.writer.add_summary(summary_str, counter)
 
                 # update G network
                 if counter%self.disc_iters==0:
@@ -509,16 +434,15 @@ class WGAN(object):
                                                            self.imputed_deltapre:imputed_deltapre,
                                                            self.imputed_deltasub:imputed_deltasub,
                                                            self.mean: data_mean})
-                    self.writer.add_summary(summary_str, counter)
                     print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f,counter:%4d" \
-                      % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, g_loss,counter))
+                      % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, g_loss,counter), end='\r')
                     #debug 
 
                 counter += 1
 
                 # display training status
                 print("Epoch: [%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, counter:%4d" \
-                      % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, counter))
+                      % (epoch, idx, self.num_batches, time.time() - start_time, d_loss, counter), end='\r')
 
                 # save training results for every 300 steps
                 if np.mod(counter, 300) == 0 :
@@ -535,30 +459,28 @@ class WGAN(object):
                                                        self.imputed_deltasub:imputed_deltasub,
                                                        self.mean: data_mean,
                                                        self.keep_prob: 0.5})
-                    if self.run_type=="train":
-                        self.writeG_Samples("G_sample_x",counter,fake_x)
-                        self.writeG_Samples("G_sample_delta",counter,fake_delta)
-                    
                 idx+=1
             # After an epoch, start_batch_id is set to zero
             # non-zero value is only for the first epoch after loading pre-trained model
             start_batch_id = 0
 
         
-        self.save(self.checkpoint_dir, counter)
+        # self.save(self.checkpoint_dir, counter)
 
     def imputation(self,dataset,isTrain):
-        self.datasets=dataset
+        self.output_mat = []
+        self.tmp = []
+        self.row = 0
+        self.col = 0
+        self.datasets = dataset
         self.datasets.shuffle(self.batch_size,False)
         tf.variables_initializer([self.z_need_tune]).run()
-        #是否shuffle无所谓，填充之后存起来，测试的时候用填充之后的数据再shuffle即可
-        #训练数据集不能被batch_size整除剩下的部分，扔掉
         start_time = time.time()
         batchid=1
         impute_tune_time=1
-        counter=1
+
         for data_x,data_y,data_mean,data_m,data_deltaPre,data_x_lengths,data_lastvalues,_,imputed_deltapre,imputed_m,deltaSub,subvalues,imputed_deltasub in self.datasets.nextBatch():
-            #self.z_need_tune=tf.assign(self.z_need_tune,tf.random_normal([self.batch_size,self.z_dim]))
+            counter=1
             tf.variables_initializer([self.z_need_tune]).run()
             for i in range(0,self.impute_iter):
                 _, impute_out, summary_str, impute_loss, imputed = self.sess.run([self.impute_optim, self.impute_out, self.impute_sum, self.impute_loss, self.imputed], \
@@ -578,123 +500,13 @@ class WGAN(object):
                 counter+=1
                 if counter%10==0:
                     print("Batchid: [%2d] [%4d/%4d] time: %4.4f, impute_loss: %.8f" \
-                          % (batchid, impute_tune_time, self.impute_iter, time.time() - start_time, impute_loss))
-                    self.writer.add_summary(summary_str, counter/10)
-            #imputed=tf.multiply((1-self.m),impute_out)+data_x
-            self.save_imputation(imputed,batchid,data_x_lengths,data_deltaPre,data_y,isTrain)
+                          % (batchid, i, self.impute_iter, time.time() - start_time, impute_loss), end='\r')
+                if counter == self.impute_iter:
+                    for imputed_ts in imputed:
+                        self.tmp.append(imputed_ts)
+
             batchid+=1
-            impute_tune_time=1
-    @property
-    def model_dir(self):
-        return "{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}".format(
-            self.epoch,self.disc_iters,
-            self.batch_size, self.z_dim,
-            self.lr,self.impute_iter,
-            self.isNormal,self.isbatch_normal,
-            self.isSlicing,self.g_loss_lambda,
-            self.beta1
-            )
+            impute_tune_time+=1
+        self.output_mat = np.array(self.tmp)
+        return self.output_mat.T.squeeze()
 
-
-    def save_imputation(self,impute_out,batchid,data_x_lengths,data_times,data_y,isTrain):
-        #填充后的数据全是n_steps长度！，但只有data_x_lengths才是可用的
-        if isTrain:
-            imputation_dir="imputation_train_results"
-        else:
-            imputation_dir="imputation_test_results"
-        
-        if not os.path.exists(os.path.join(imputation_dir,\
-                                     self.model_name,\
-                                     self.model_dir)):
-            os.makedirs(os.path.join(imputation_dir,\
-                                     self.model_name,\
-                                     self.model_dir))
-            
-        #write imputed data
-        resultFile=open(os.path.join(imputation_dir,\
-                                     self.model_name,\
-                                     self.model_dir,\
-                                     "batch"+str(batchid)+"x"),'w')
-        for length in data_x_lengths:
-            resultFile.writelines(str(length)+",")
-        resultFile.writelines("\r\n")
-        # impute_out:ndarray
-        for oneSeries in impute_out:
-            resultFile.writelines("begin\r\n")
-            for oneClass in oneSeries:
-                for i in oneClass.flat:
-                    resultFile.writelines(str(i)+",")
-                resultFile.writelines("\r\n")
-            resultFile.writelines("end\r\n")
-        resultFile.close()
-        
-        #write data_times data_times:list
-        resultFile=open(os.path.join(imputation_dir,\
-                                     self.model_name,\
-                                     self.model_dir,\
-                                     "batch"+str(batchid)+"delta"),'w')
-        for oneSeries in data_times:
-            resultFile.writelines("begin\r\n")
-            for oneClass in oneSeries:
-                for i in oneClass:
-                    resultFile.writelines(str(i)+",")
-                resultFile.writelines("\r\n")
-            resultFile.writelines("end\r\n")
-        resultFile.close()
-        
-        #write y
-        resultFile=open(os.path.join(imputation_dir,\
-                                     self.model_name,\
-                                     self.model_dir,\
-                                     "batch"+str(batchid)+"y"),'w')
-        for oneSeries in data_y:
-            #resultFile.writelines("begin\r\n")
-            for oneClass in oneSeries:
-                resultFile.writelines(str(oneClass)+",")
-            resultFile.writelines("\r\n")
-            #resultFile.writelines("end\r\n")
-        resultFile.close()
-        
-    def writeG_Samples(self,filename,step,o):
-        if not os.path.exists(os.path.join("G_results",\
-                                     self.model_name,\
-                                     self.model_dir)):
-            os.makedirs(os.path.join("G_results",\
-                                     self.model_name,\
-                                     self.model_dir))
-        resultFile=open(os.path.join("G_results",\
-                                     self.model_name,\
-                                     self.model_dir,\
-                                     filename+str(step)),'w')
-        for oneSeries in o:
-            resultFile.writelines("begin\r\n")
-            for oneClass in oneSeries:
-                for i in oneClass.flat:
-                    resultFile.writelines(str(i)+",")
-                resultFile.writelines("\r\n")
-            resultFile.writelines("end\r\n")
-        resultFile.close()
-    
-    def save(self, checkpoint_dir, step):
-        checkpoint_dir = os.path.join(checkpoint_dir, self.model_name, self.model_dir )
-
-        if not os.path.exists(checkpoint_dir):
-            os.makedirs(checkpoint_dir)
-
-        self.saver.save(self.sess,os.path.join(checkpoint_dir, self.model_name+'.model'), global_step=step)
-
-    def load(self, checkpoint_dir):
-        import re
-        print(" [*] Reading checkpoints...")
-        checkpoint_dir = os.path.join(checkpoint_dir, self.model_name, self.model_dir)
-
-        ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
-        if ckpt and ckpt.model_checkpoint_path:
-            ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-            self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
-            counter = int(next(re.finditer("(\d+)(?!.*\d)",ckpt_name)).group(0))
-            print(" [*] Success to read {}".format(ckpt_name))
-            return True, counter
-        else:
-            print(" [*] Failed to find a checkpoint")
-            return False, 0
