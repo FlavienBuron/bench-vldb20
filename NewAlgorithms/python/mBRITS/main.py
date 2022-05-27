@@ -3,6 +3,7 @@
 ## https://github.com/lmluzern/BRITS/ ##
 ########################################
 import random
+import os
 
 import torch
 import torch.optim as optim
@@ -31,15 +32,22 @@ args = parser.parse_args()
 # setting seeds for reproducibility
 torch.manual_seed(0)
 np.random.seed(0)
+random.seed(0)
 
 def train(model, input):
     optimizer = optim.Adam(model.parameters(), lr = 1e-3)
     data_iter = data_loader.get_loader(input, batch_size = args.batch_size)
+    patience = 20
+    counter = 0
+    best_score = None
 
-    for epoch in xrange(args.epochs):
+    l=[]
+
+    for epoch in range(args.epochs):
         model.train()
 
         run_loss = 0.0
+        i = 0
 
         for idx, data in enumerate(data_iter):
             data = utils.to_var(data)
@@ -49,7 +57,28 @@ def train(model, input):
 
             print '\r Progress epoch {}, {:.2f}%, average loss {}'.format(epoch, (idx + 1) * 100.0 / len(data_iter), run_loss / (idx + 1.0)),
         #end for
-    #end for    
+        loss = run_loss/(i+1.0)
+        l.append(loss)
+
+        if best_score == None:
+            best_score = loss
+        elif loss > best_score:
+            counter += 1
+            print 'Early Stopping counter: {} out of {}'.format(counter, patience)
+            if counter >= patience:
+                print 'Early Stopping'
+                break
+        else:
+            best_score = loss
+            counter = 0
+    #end for
+    l = np.array(l)
+    for i in range(8):
+        if os.path.exists('run_loss_'+str(i)+'.txt'):
+            continue
+        else:
+            np.savetxt('run_loss_'+str(i)+'.txt', l.reshape(-1, 1))
+            break
     
     return (model, data_iter)
 #end function
@@ -73,13 +102,13 @@ def evaluate(model, val_iter):
 
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
-    n, m = matrix.shape
-    args.batch_size=m//10
+    seq_len, ts_nb = matrix.shape
+    args.batch_size= ts_nb//10
     print 'Batch size: {}'.format(args.batch_size)
     prepare_dat(input, input + ".tmp")
 
+    model = getattr(models, args.model).Model(seq_len, ts_nb)
     start = time.time()
-    model = getattr(models, args.model).Model(n)
 
     if torch.cuda.is_available():
         model = model.cuda()
@@ -91,11 +120,7 @@ def run(input, output, rt = 0):
     if rt > 0:
         np.savetxt(output, np.array([(end - start) * 1000 * 1000]))
     else:
-        for i in range(0, len(res)):
-            res_l = res[i, :n];
-            matrix[:, i] = res_l.reshape(n);
-        #end for
-        np.savetxt(output, matrix)
+        np.savetxt(output, res.squeeze())
     #end if
 
     print ''

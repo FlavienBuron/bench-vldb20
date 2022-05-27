@@ -66,7 +66,7 @@ def main (args):
   start_time = time.time()
   
   # Impute missing data
-  imputed_data_x = gain(miss_data_x, gain_parameters)
+  imputed_data_x = gain(miss_data_x, data_m, gain_parameters)
 
   # imputation is complete - stop time measurement
   end_time = time.time()

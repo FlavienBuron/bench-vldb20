@@ -10,11 +10,9 @@ def mrnn_recov(matrix_in, matrix_out, runtime):
         seq_length, matrix_in)
 
     start_time = time.time()
-
     _, Recover_testX = M_RNN(trainZ, trainM, trainT, testZ, testM, testT)
 
     m = len(x[0])  # columns
-
     # part 1: upper block
     for si in range(0, seq_length - 1):  # si = sequence index
         i = train_size + si  # index in the main matrix

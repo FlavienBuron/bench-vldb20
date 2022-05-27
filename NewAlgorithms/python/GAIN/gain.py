@@ -34,7 +34,7 @@ from utils import xavier_init
 from utils import binary_sampler, uniform_sampler, sample_batch_index
 
 
-def gain (data_x, gain_parameters):
+def gain (data_x, data_m, gain_parameters):
   '''Impute missing values in data_x
   
   Args:
@@ -48,8 +48,6 @@ def gain (data_x, gain_parameters):
   Returns:
     - imputed_data: imputed data
   '''
-  # Define mask matrix
-  data_m = 1-np.isnan(data_x)
   
   # System parameters
   batch_size = gain_parameters['batch_size']
