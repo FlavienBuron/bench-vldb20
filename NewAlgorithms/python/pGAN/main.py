@@ -21,13 +21,13 @@ def validation(generator, X_val, mask):
 
     generator_imputation = generator(X_val)
     val_loss = tf.reduce_mean(tf.math.abs(tf.math.multiply(generator_imputation, mask) - tf.math.multiply(X_val, mask)))
-
+    generator_imputation = X_val * mask + (1 - mask) * generator_imputation
     print('\t\tValidation Loss: {}\n'.format(val_loss))\
 
     return generator_imputation
 
 
-@tf.function
+# @tf.function
 def train(
         generator, discriminator, generator_optimizer, discriminator_optimizer, cross_entropy,
         X_batch, Y_batch, real_example, real_example_mask, mask, w):
@@ -84,11 +84,11 @@ def run(input, output, runtime):
 
     dataX, dataM = data_loader.data_loader(input)
 
-    seq_len = dataX.shape[1]
-    BATCH_SIZE = dataX.shape[0]//10
+    _, seq_len, ndims = dataX.shape
+    BATCH_SIZE = dataX.shape[0]//1
     print("Batch size: ", BATCH_SIZE)
 
-    Imputer, Discriminator = model.build_GAN(seq_len)
+    Imputer, Discriminator = model.build_GAN(seq_len, ndims)
     X_val = tf.cast(dataX, tf.float32)
     M_val = dataM
 
@@ -150,7 +150,7 @@ def run(input, output, runtime):
                 print(
                     f'\r{epoch}.{iteration} Generator Loss: {generator_current_loss:.8f}, '
                     f'Discriminator Loss: {discriminator_current_loss:.8f}, '
-                    f'Discriminator Accuracy (reals, fakes): ({d_acc_real:.8f}, {d_acc_real:.8f}),'
+                    f'Discriminator Accuracy (reals, fakes): ({d_acc_real:.8f}, {d_acc_fake:.8f}),'
                     f' Imputation Loss: {train_loss:.8f}',
                     end='\r')
 
@@ -164,7 +164,7 @@ def run(input, output, runtime):
     if runtime > 0:
         np.savetxt(output, np.array([exec_time]))
     else:
-        np.savetxt(output, np.squeeze(out_matrix, 2).T)
+        np.savetxt(output, np.squeeze(out_matrix, 0))
 
 
 if __name__ == '__main__':

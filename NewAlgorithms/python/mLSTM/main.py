@@ -32,7 +32,6 @@ def train(model, input, batch_size=8):
     patience = 20
     counter = 0
     best_score = None
-    early_stop = False
 
     l=[]
     for epoch in range(EPOCHS):
@@ -96,14 +95,13 @@ def evaluate(model, val_iter):
 
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
-    n, m = matrix.shape
-    batch_size = m//10
+    seq_len, ts_nb = matrix.shape
+    batch_size = ts_nb//1
     print 'Batch size: {}'.format(batch_size)
     data_prep(input, input + ".tmp")
 
+    model = lstm.LSTM(seq_len, ts_nb)
     start = time.time()
-    model = lstm.LSTM(n)
-
     if torch.cuda.is_available():
         model = model.cuda()
 
@@ -114,13 +112,10 @@ def run(input, output, rt = 0):
     if rt > 0:
         np.savetxt(output, np.array([(end - start) * 1000 * 1000]))
     else:
-        for i in range(0, len(res)):
-            res_l = res[i, :n];
-            matrix[:, i] = res_l.reshape(n);
-        np.savetxt(output, matrix)
+        np.savetxt(output, res.squeeze())
 
     print ''
-    print 'Time (LSTM):', ((end - start) * 1000 * 1000)
+    print 'Time (mLSTM):', ((end - start) * 1000 * 1000)
 
 if __name__ == '__main__':
     input = args.input

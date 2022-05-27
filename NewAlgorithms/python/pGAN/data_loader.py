@@ -11,7 +11,7 @@ def data_loader(filename):
 
     data = np.loadtxt(filename, delimiter=" ", skiprows=0)
     # transform reshape data into (nb_col, ts_len, 1)
-    data = np.expand_dims(data.T, 2)
+    data = np.expand_dims(data, 0)
     dataX = np.nan_to_num(data, nan=0.0)
     dataM = (~np.isnan(data)).astype(np.float32)
 

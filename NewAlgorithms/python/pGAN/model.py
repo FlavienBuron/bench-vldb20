@@ -13,7 +13,7 @@ from tensorflow.keras.layers import (
 USE_BATCHNORM = False
 
 
-def build_vanilla_seq2seq(seq_len):
+def build_vanilla_seq2seq(seq_len, ndims):
     """
     Implements a seq2seq RNN with Convolutional self attention. It keeps a canonical
     Encoder-Decoder structure: an Embedding layers receives the sequence of chars and
@@ -27,7 +27,7 @@ def build_vanilla_seq2seq(seq_len):
     """
 
     ## ENCODER
-    encoder_input = Input((seq_len, 1))
+    encoder_input = Input((seq_len, ndims))
 
     #LSTM block
     encoder_lstm = LSTM(units=64)(encoder_input)
@@ -91,14 +91,14 @@ def build_vanilla_seq2seq(seq_len):
     return seq2seq
 
 
-def build_discriminator(seq_len):
+def build_discriminator(seq_len, ndims):
     '''
     Discriminator is based on the Vanilla seq2seq Encoder. The Decoder is removed
     and a Dense layer is left instead to perform binary classification.
     '''
 
     ## ENCODER
-    encoder_input = Input((seq_len, 1))
+    encoder_input = Input((seq_len, ndims))
 
     #LSTM block
     encoder_lstm = LSTM(units=64)(encoder_input)
@@ -144,12 +144,12 @@ def build_discriminator(seq_len):
     return Discriminator
 
 
-def build_GAN(seq_len):
+def build_GAN(seq_len, ndims):
     '''
     This is just a wrapper in case the model is trained as a GAN. It calls the vanilla
     seq2seq Generator, and build_discriminator() for the Discriminator model.
     '''
 
-    generator = build_vanilla_seq2seq(seq_len)
-    discriminator = build_discriminator(seq_len)
+    generator = build_vanilla_seq2seq(seq_len, ndims)
+    discriminator = build_discriminator(seq_len, ndims)
     return generator, discriminator

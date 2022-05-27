@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import random
 import time
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -11,6 +12,11 @@ import argparse
 import numpy as np
 from data_loader import DataLoader
 import os
+
+tf.random.set_seed(0)
+np.random.seed(0)
+random.seed(0)
+
 
 def main():
     # parse arguments
@@ -53,6 +59,7 @@ def main():
     input_matrix = np.loadtxt(args.input)
     row, col = input_matrix.shape
     args.shape = (row, col)
+    args.n_inputs = col
     batch_size = col // 1
     args.batch_size = batch_size
     args.shape = (row, col)
@@ -73,7 +80,6 @@ def main():
                 tf.reset_default_graph()
                 config = tf.ConfigProto() 
                 config.gpu_options.allow_growth = True
-                start_time = time.time()
                 with tf.Session(config=config) as sess:
                     gan = WGAN_GRUI.WGAN(sess,
                                 args=args,
@@ -83,6 +89,7 @@ def main():
                     # build graph
                     print("Building model")
                     gan.build_model()
+                    start_time = time.time()
                     # launch the graph in a session
                     print("Starting training")
                     gan.train()

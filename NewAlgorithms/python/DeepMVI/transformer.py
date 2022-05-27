@@ -32,6 +32,7 @@ def train(model,train_loader,val_loader,device):
         print("Starting Epoch : %d"%epoch)
 
         for inp_,mask,residuals,context_info in train_loader :
+            print(iteration, end='\r')
             inp_ = inp_.to(device).requires_grad_(True)
             loss = model(inp_,mask.to(device),residuals.to(device),context_info)
             optim.zero_grad()
@@ -40,31 +41,31 @@ def train(model,train_loader,val_loader,device):
             optim.step()
             iteration += 1
             train_error += float(loss['mae'].cpu())
-            if (iteration % interval == 0):
-                model.eval()
-                loss_mre_num,count = 0,0
-                with torch.no_grad():
-                    for inp_,mask,residuals,context_info in val_loader :
-                        loss = model.validate(inp_.to(device),mask.to(device),
-                                              residuals.to(device),context_info)
-                        loss_mre_num += (loss['loss_values']).sum()
-                        count += len(loss['loss_values'])
-                if (float(loss_mre_num)/count < 0.99*best_loss):
-                    tolerance_epoch = 0
-                    best_loss = float(loss_mre_num)/count
-                elif (float(loss_mre_num)/count < best_loss):
-                    best_state_dict = model.state_dict()
-                    tolerance_epoch += 1
-                else :
-                    tolerance_epoch += 1
-                print ('done validation, Patience : ',tolerance_epoch)
-                print ('validation loss : ',float(loss_mre_num/count))
-                print ('train loss : ',float(train_error/interval))
-                model.train()
-                train_error = 0
-                if (tolerance_epoch >= patience):
-                    print ('Early Stopping')
-                    return best_state_dict
+        if True:
+            model.eval()
+            loss_mre_num,count = 0,0
+            with torch.no_grad():
+                for inp_,mask,residuals,context_info in val_loader :
+                    loss = model.validate(inp_.to(device),mask.to(device),
+                                          residuals.to(device),context_info)
+                    loss_mre_num += (loss['loss_values']).sum()
+                    count += len(loss['loss_values'])
+            if (float(loss_mre_num)/count < 0.99*best_loss):
+                tolerance_epoch = 0
+                best_loss = float(loss_mre_num)/count
+            elif (float(loss_mre_num)/count < best_loss):
+                best_state_dict = model.state_dict()
+                tolerance_epoch += 1
+            else :
+                tolerance_epoch += 1
+            print ('done validation, Patience : ',tolerance_epoch)
+            print ('validation loss : ',float(loss_mre_num/count))
+            print ('train loss : ',float(train_error/interval))
+            model.train()
+            train_error = 0
+            if (tolerance_epoch >= patience):
+                print ('Early Stopping')
+                return best_state_dict
     return best_state_dict
 
 def test(model,test_loader,val_feats,device):
@@ -121,7 +122,7 @@ def transformer_recovery(input_feats):
     print ('Use Local Attention : ',use_local)
 
     batch_size = min(input_feats.shape[1]*int(input_feats.shape[0]/time_context),16)
-    batch_size = input_feats.shape[1]//10
+    batch_size = input_feats.shape[1]//2
     print('Batch size: ', batch_size)
     interval = 1000
        
