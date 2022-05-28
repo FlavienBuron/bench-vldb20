@@ -63,6 +63,7 @@
     <Compile Include="AlgoIntegration\AlgoPack.cs" />
     <Compile Include="AlgoIntegration\Algorithm.cs" />
     <Compile Include="AlgoIntegration\BRITSAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\MBRITSAlgorithm.cs" />
     <Compile Include="AlgoIntegration\DynaMMoAlgorithm.cs" />
     <Compile Include="AlgoIntegration\GrouseAlgorithm.cs" />
     <Compile Include="AlgoIntegration\CentroidDecompositionRecoveryAlgorithm.cs" />
@@ -80,10 +81,13 @@
     <Compile Include="AlgoIntegration\MeanImputeAlgorithm.cs" />
     <Compile Include="AlgoIntegration\LinearImputeAlgorithm.cs" />
     <Compile Include="AlgoIntegration\LSTMAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\MLSTMAlgorithm.cs" />
     <Compile Include="AlgoIntegration\DeepMVIAlgorithm.cs" />
     <Compile Include="AlgoIntegration\GAINAlgorithm.cs" />
     <Compile Include="AlgoIntegration\E2EGANAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\ME2EGANAlgorithm.cs" />
     <Compile Include="AlgoIntegration\WGANAlgorithm.cs" />
+    <Compile Include="AlgoIntegration\MWGANAlgorithm.cs" />
     <Compile Include="AlgoIntegration\pGANAlgorithm.cs" />
     <Compile Include="AlgoIntegration\NAOMIAlgorithm.cs" />
     <Compile Include="Program.cs" />

@@ -32,19 +32,23 @@ namespace TestingFramework.AlgoIntegration
         public static readonly Algorithm LinImp = new LinearImputeAlgorithm();
         public static readonly Algorithm MvExport = new MissingValueExportAlgorithm();
         public static readonly Algorithm Lstm = new LSTMAlgorithm();
+        public static readonly Algorithm MLstm = new MLSTMAlgorithm();
         public static readonly Algorithm DeepMvi = new DeepMVIAlgorithm();
         public static readonly Algorithm Gain = new GAINAlgorithm();
         public static readonly Algorithm E2egan = new E2EGANAlgorithm();
+        public static readonly Algorithm ME2egan = new ME2EGANAlgorithm();
         public static readonly Algorithm Wgan = new WGANAlgorithm();
+        public static readonly Algorithm MWgan = new MWGANAlgorithm();
         public static readonly Algorithm pgan = new pGANAlgorithm();
         public static readonly Algorithm Naomi = new NAOMIAlgorithm();
+        public static readonly Algorithm MBrits = new MBRITSAlgorithm();
 
         //example:
         //    public static readonly Algorithm Example = new ExampleAlgorithm();
         
         public static Algorithm[] ListAlgorithms = {
             Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa,
-            Mrnn, Brits, Lstm, DeepMvi, Gain, E2egan, Wgan, pgan, Naomi };
+            Mrnn, Brits, Lstm, MLstm, DeepMvi, Gain, E2egan, Wgan, pgan, Naomi, MBrits, MWgan, ME2egan };
         public static Algorithm[] ListAlgorithmsMulticolumn = null;
 
         public const int TypicalTruncation = 3;
@@ -232,6 +236,16 @@ namespace TestingFramework.AlgoIntegration
         public int Epochs = 100;
     }
 
+    public partial class MBRITSAlgorithm
+    {
+        public override string AlgCode => "mbrits";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/mBRITS/";
+        protected override string SubFolderDataIn => "data/in/";
+        protected override string SubFolderDataOut => "data/out/";
+        public override bool IsMultiColumn => true;
+        public int Epochs = 100;
+    }
+
     public partial class MRNNAlgorithm
     {
         public override string AlgCode => "m-rnn";
@@ -268,6 +282,15 @@ namespace TestingFramework.AlgoIntegration
         public override bool IsMultiColumn => true;
     }
 
+    public partial class MLSTMAlgorithm
+    {
+        public override string AlgCode => "mlstm";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/mLSTM/";
+        protected override string SubFolderDataIn => "data/in/";
+        protected override string SubFolderDataOut => "data/out/";
+        public override bool IsMultiColumn => true;
+    }
+
     public partial class DeepMVIAlgorithm
     {
         public override string AlgCode => "deepmvi";
@@ -295,10 +318,28 @@ namespace TestingFramework.AlgoIntegration
         public override bool IsMultiColumn => true;
     }
 
+    public partial class ME2EGANAlgorithm
+    {
+        public override string AlgCode => "me2egan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/mE2EGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
     public partial class WGANAlgorithm
     {
         public override string AlgCode => "wgan";
         protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/WGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class MWGANAlgorithm
+    {
+        public override string AlgCode => "mwgan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalNewAlgorithmsLocation}python/mWGAN/";
         protected override string SubFolderDataIn => "in/";
         protected override string SubFolderDataOut => "out/";
         public override bool IsMultiColumn => true;
