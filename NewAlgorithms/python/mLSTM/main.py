@@ -29,48 +29,19 @@ args = parser.parse_args()
 def train(model, input, batch_size=8):
     optimizer = optim.Adam(model.parameters(), lr = 1e-3)
     data_iter = data_loader.get_loader(input, batch_size=batch_size)
-    patience = 20
-    counter = 0
-    best_score = None
 
-    l=[]
     for epoch in range(EPOCHS):
         model.train()
-
         run_loss = 0.0
-        i = 0
         for idx, data in enumerate(data_iter):
             # print '\r {}'.format(idx)
             data = utils.to_var(data)
             ret = model.run_on_batch(data, optimizer)
 
             run_loss += ret['loss'].data
-            i = idx
             print '\r Progress epoch {}, {:.2f}%, average loss {}'.format(epoch, (idx+1) * 100.0 / len(data_iter), run_loss / (idx+1.0)),
         #end for
-        loss = run_loss/(i+1.0)
-        l.append(loss)
-    
-        if best_score == None:
-            best_score = loss
-        elif loss > best_score:
-            counter += 1
-            print 'Early Stopping counter: {} out of {}'.format(counter, patience)
-            if counter >= patience:
-                print 'Early Stopping'
-                break
-        else:
-            best_score = loss
-            counter = 0
     #end for
-    l = np.array(l)
-    for i in range(8):
-        if os.path.exists('run_loss_'+str(i)+'.txt'):
-            continue
-        else:
-            np.savetxt('run_loss_'+str(i)+'.txt', l.reshape(-1, 1))
-            break
-
     return (model, data_iter)
 #end func
 

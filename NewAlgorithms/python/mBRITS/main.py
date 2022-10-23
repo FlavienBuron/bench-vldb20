@@ -29,25 +29,23 @@ parser.add_argument('--output', type = str)
 parser.add_argument('--runtime', type = int, default = 0)
 args = parser.parse_args()
 
+args.epochs = 100
+
 # setting seeds for reproducibility
 torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
 
+PATIENCE = 20
+
 def train(model, input):
     optimizer = optim.Adam(model.parameters(), lr = 1e-3)
     data_iter = data_loader.get_loader(input, batch_size = args.batch_size)
-    patience = 20
-    counter = 0
-    best_score = None
-
-    l=[]
 
     for epoch in range(args.epochs):
         model.train()
 
         run_loss = 0.0
-        i = 0
 
         for idx, data in enumerate(data_iter):
             data = utils.to_var(data)
@@ -57,29 +55,7 @@ def train(model, input):
 
             print '\r Progress epoch {}, {:.2f}%, average loss {}'.format(epoch, (idx + 1) * 100.0 / len(data_iter), run_loss / (idx + 1.0)),
         #end for
-        loss = run_loss/(i+1.0)
-        l.append(loss)
-
-        if best_score == None:
-            best_score = loss
-        elif loss > best_score:
-            counter += 1
-            print 'Early Stopping counter: {} out of {}'.format(counter, patience)
-            if counter >= patience:
-                print 'Early Stopping'
-                break
-        else:
-            best_score = loss
-            counter = 0
     #end for
-    l = np.array(l)
-    for i in range(8):
-        if os.path.exists('run_loss_'+str(i)+'.txt'):
-            continue
-        else:
-            np.savetxt('run_loss_'+str(i)+'.txt', l.reshape(-1, 1))
-            break
-    
     return (model, data_iter)
 #end function
 
@@ -103,8 +79,8 @@ def evaluate(model, val_iter):
 def run(input, output, rt = 0):
     matrix = np.loadtxt(input)
     seq_len, ts_nb = matrix.shape
-    args.batch_size= ts_nb//10
-    print 'Batch size: {}'.format(args.batch_size)
+    args.batch_size= ts_nb
+    print 'Batch size: {}, epochs: {}, patience: {}'.format(args.batch_size, args.epochs, PATIENCE)
     prepare_dat(input, input + ".tmp")
 
     model = getattr(models, args.model).Model(seq_len, ts_nb)

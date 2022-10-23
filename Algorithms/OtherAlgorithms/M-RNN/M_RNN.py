@@ -6,8 +6,13 @@ M-RNN Architecture (Updated)
 #%% Necessary Packages
 import tensorflow as tf
 import numpy as np
+import random
 
 from tensorflow.python.framework import ops
+
+random.seed(0)
+np.random.seed(0)
+tf.set_random_seed(0)
 
 #%% Main Function
 
@@ -20,6 +25,7 @@ def M_RNN (trainZ, trainM, trainT, testZ, testM, testT):
     seq_length = len(trainZ[0,:,0])
     feature_dim = len(trainZ[0,0,:])
     hidden_dim = 10
+    print 'Hidden Size: {}'.format(hidden_dim)
     
     learning_rate = 0.01
     iterations = 1000
@@ -248,10 +254,10 @@ def M_RNN (trainZ, trainM, trainT, testZ, testM, testT):
             Input_Temp_Rev = np.flip(Input_Temp, 1)
             
             Input = np.zeros([len(trainZ), seq_length, 3]) 
-            Input[:,1:,:] = Input_Temp[:,:6,:] 
+            Input[:,1:,:] = Input_Temp[:,:(seq_length-1),:]
             
             Input_Rev = np.zeros([len(trainZ), seq_length, 3]) 
-            Input_Rev[:,1:,:] = Input_Temp_Rev[:,:6,:] 
+            Input_Rev[:,1:,:] = Input_Temp_Rev[:,:(seq_length-1),:]
             
             _, step_loss = sess.run([train, loss], feed_dict={M: np.transpose(np.dstack(trainM[:,:,f]),[1, 2, 0]), 
                                     Y: np.transpose(np.dstack(trainZ[:,:,f]),[1, 2, 0]),
@@ -411,7 +417,4 @@ def M_RNN (trainZ, trainM, trainT, testZ, testM, testT):
                         final_results_test[i,j,k] = testZ[i,np.min(idx),k]
         
     return [output_train, output_test]
-     
-
 #%%
- 

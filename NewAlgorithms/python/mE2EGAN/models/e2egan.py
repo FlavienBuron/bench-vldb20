@@ -590,4 +590,4 @@ class E2EGAN(object):
                 self.tmp.append(imputed_ts)
             batch_id = batch_id + 1
         self.output_mat = np.array(self.tmp)
-        return self.output_mat.T.squeeze()
+        return self.output_mat.squeeze()

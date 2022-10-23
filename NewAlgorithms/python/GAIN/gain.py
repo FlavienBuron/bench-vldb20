@@ -39,6 +39,7 @@ def gain (data_x, data_m, gain_parameters):
   
   Args:
     - data_x: original data with missing values
+    - data_m: mask matrix of the missing values
     - gain_parameters: GAIN network parameters:
       - batch_size: Batch size
       - hint_rate: Hint rate

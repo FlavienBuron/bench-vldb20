@@ -56,9 +56,9 @@ def main (args):
                      'alpha': args.alpha,
                      'iterations': args.iterations}
   
-  # Load data and introduce missingness
+  # Load data and return missing values nask
   miss_data_x, data_m = data_loader(input)
-  batch_size = miss_data_x.shape[1]//10
+  batch_size = miss_data_x.shape[1]//1
   gain_parameters['batch_size'] = batch_size
   print('Batch size: ', gain_parameters["batch_size"])
 

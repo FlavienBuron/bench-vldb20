@@ -5,6 +5,7 @@ from M_RNN import M_RNN
 
 def mrnn_recov(matrix_in, matrix_out, runtime):
     seq_length = 7
+    print 'Seqence length: {}'.format(seq_length)
 
     _, trainZ, trainM, trainT, testX, testZ, testM, testT, dmin, dmax, train_size, x = Data_Loader_Incomplete(
         seq_length, matrix_in)

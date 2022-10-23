@@ -13,7 +13,7 @@ import numpy as np
 from data_loader import DataLoader
 import os
 
-tf.random.set_seed(0)
+tf.set_random_seed(0)
 np.random.seed(0)
 random.seed(0)
 
@@ -22,9 +22,9 @@ def main():
     # parse arguments
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--batch_size', type=int, default=25)
-    parser.add_argument('--gen-length', type=int, default=96)
-    parser.add_argument('--impute-iter', type=int, default=400)
-    parser.add_argument('--pretrain-epoch', type=int, default=5)
+    parser.add_argument('--gen_length', type=int, default=96)
+    parser.add_argument('--impute_iter', type=int, default=400)
+    parser.add_argument('--pretrain_epoch', type=int, default=5)
     parser.add_argument('--g_loss_lambda',type=float,default=0.1)
     parser.add_argument('--beta1',type=float,default=0.5)
     parser.add_argument('--lr', type=float, default=0.001)
@@ -60,7 +60,7 @@ def main():
     row, col = input_matrix.shape
     args.shape = (row, col)
     args.n_inputs = col
-    batch_size = col // 1
+    batch_size = 1
     args.batch_size = batch_size
     args.shape = (row, col)
     print(f'Batch size: {batch_size}')
@@ -72,9 +72,9 @@ def main():
     for beta1 in beta1s:
         for e in epochs:
             for g_l in g_loss_lambdas:
-                args.epoch=e
-                args.beta1 = beta1
-                args.g_loss_lambda=g_l
+                # args.epoch=e
+                # args.beta1 = beta1
+                # args.g_loss_lambda=g_l
                 tf.reset_default_graph()
                 dt_train=DataLoader(input_matrix)# dt_test=readTestData.ReadPhysionetData(os.path.join(args.data_path,"test"), os.path.join(args.data_path,"test","list.txt"),dt_train.maxLength,isNormal=args.isNormal,isSlicing=args.isSlicing)
                 tf.reset_default_graph()
@@ -88,8 +88,8 @@ def main():
 
                     # build graph
                     print("Building model")
-                    gan.build_model()
                     start_time = time.time()
+                    gan.build_model()
                     # launch the graph in a session
                     print("Starting training")
                     gan.train()

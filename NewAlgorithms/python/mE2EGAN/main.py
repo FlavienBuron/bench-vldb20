@@ -22,17 +22,17 @@ def main():
     # parse arguments
     parser = argparse.ArgumentParser(description='manual to this script')
     parser.add_argument('--batch_size', type=int, default=5)
-    parser.add_argument('--gen-length', type=int, default=96)
-    parser.add_argument('--impute-iter', type=int, default=400)
+    parser.add_argument('--gen-length', type=int, default=4)
+    parser.add_argument('--impute-iter', type=int, default=16)
     parser.add_argument('--pretrain-epoch', type=int, default=5)
     parser.add_argument('--g_loss_lambda',type=float,default=100)
     parser.add_argument('--beta1',type=float,default=0.5)
     parser.add_argument('--lr', type=float, default=0.005)
     parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--n_inputs', type=int, default=1)
-    parser.add_argument('--n-hidden-units', type=int, default=64)
+    parser.add_argument('--n-hidden-units', type=int, default=4)
     parser.add_argument('--n-classes', type=int, default=1)
-    parser.add_argument('--z-dim', type=int, default=64)
+    parser.add_argument('--z-dim', type=int, default=4)
     parser.add_argument('--isNormal',type=int,default=1)
     parser.add_argument('--isBatch-normal',type=int,default=0)
     parser.add_argument('--isSlicing',type=int,default=1)
@@ -56,17 +56,17 @@ def main():
     if args.isSlicing==1:
             args.isSlicing=True
     
-    input_matrix = np.loadtxt(args.input)
+    input_matrix = np.loadtxt(args.input)[:10]
     row, col = input_matrix.shape
     args.shape = (row, col)
     args.n_inputs = col
-    batch_size = col//10
+    batch_size = 1
     args.batch_size = batch_size
     print(f'Batch size: {batch_size}')
 
     epochs=[args.epoch]
     g_loss_lambdas=[args.g_loss_lambda]
-    disc_iters = [7]
+    disc_iters = [args.disc_iters]
     for disc in disc_iters:
         for e in epochs:
             for g_l in g_loss_lambdas:
@@ -74,7 +74,7 @@ def main():
                 args.disc_iters = disc
                 args.g_loss_lambda=g_l
                 tf.reset_default_graph()
-                tf.random.set_seed(SEED)
+                tf.set_random_seed(SEED)
                 np.random.seed(SEED)
                 random.seed(SEED)
                 dt_train=DataLoader(input_matrix)
@@ -89,8 +89,8 @@ def main():
 
                     # build graph
                     print("Building model")
-                    gan.build_model()
                     start_time = time.time()
+                    gan.build_model()
                     # launch the graph in a session
                     print("Starting training")
                     gan.train()

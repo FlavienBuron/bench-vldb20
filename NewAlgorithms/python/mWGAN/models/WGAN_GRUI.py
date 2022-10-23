@@ -348,6 +348,7 @@ class WGAN(object):
                 grads[i] = (tf.clip_by_norm(g, 5), v)  # clip gradients
         train_op = optimizer.apply_gradients(grads)
         return train_op
+
     def pretrain(self, start_epoch,counter,start_time):
         
         if start_epoch < self.pretrain_epoch:
@@ -388,7 +389,7 @@ class WGAN(object):
         counter = 1
         # loop for epoch
         start_time = time.time()
-        
+        print('Start pretrain')
         self.pretrain(start_epoch,counter,start_time)
         if start_epoch < self.pretrain_epoch:
             start_epoch=self.pretrain_epoch
@@ -499,8 +500,8 @@ class WGAN(object):
                 impute_tune_time+=1
                 counter+=1
                 if counter%10==0:
-                    print("Batchid: [%2d] [%4d/%4d] time: %4.4f, impute_loss: %.8f" \
-                          % (batchid, i, self.impute_iter, time.time() - start_time, impute_loss), end='\r')
+                    print("Batchid: [%2d] [%4d/%4d] time: %4.4f, impute_loss: %.8f, shape: %d,%d" \
+                          % (batchid, i, self.impute_iter, time.time() - start_time, impute_loss, imputed.shape[0], imputed.shape[1]), end='\r')
                 if counter == self.impute_iter:
                     for imputed_ts in imputed:
                         self.tmp.append(imputed_ts)
@@ -508,5 +509,5 @@ class WGAN(object):
             batchid+=1
             impute_tune_time+=1
         self.output_mat = np.array(self.tmp)
-        return self.output_mat.T.squeeze()
+        return self.output_mat.squeeze()
 

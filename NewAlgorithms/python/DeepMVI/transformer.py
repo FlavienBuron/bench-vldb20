@@ -32,7 +32,6 @@ def train(model,train_loader,val_loader,device):
         print("Starting Epoch : %d"%epoch)
 
         for inp_,mask,residuals,context_info in train_loader :
-            print(iteration, end='\r')
             inp_ = inp_.to(device).requires_grad_(True)
             loss = model(inp_,mask.to(device),residuals.to(device),context_info)
             optim.zero_grad()
@@ -41,7 +40,7 @@ def train(model,train_loader,val_loader,device):
             optim.step()
             iteration += 1
             train_error += float(loss['mae'].cpu())
-        if True:
+        if (True):
             model.eval()
             loss_mre_num,count = 0,0
             with torch.no_grad():
@@ -88,6 +87,9 @@ def transformer_recovery(input_feats):
     torch.cuda.manual_seed_all(0)
     device = torch.device('cpu')
 
+    np.random.seed(0)
+    random.seed(0)
+
     print ('start')
     use_embed=True
     use_context=True
@@ -122,7 +124,7 @@ def transformer_recovery(input_feats):
     print ('Use Local Attention : ',use_local)
 
     batch_size = min(input_feats.shape[1]*int(input_feats.shape[0]/time_context),16)
-    batch_size = input_feats.shape[1]//2
+    batch_size = input_feats.shape[1]//1
     print('Batch size: ', batch_size)
     interval = 1000
        
