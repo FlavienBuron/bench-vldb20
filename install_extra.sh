@@ -25,6 +25,8 @@ python3.8 -m pip install torch_geometric
 python3.8 -m pip install torch_scatter
 python3.8 -m pip install torch-sparse
 python3.8 -m pip install torch_cluster
+python3.8 -m pip install pyaml
+python3.8 -m pip install torchcde ~= 0.2.5
 deactivate
 
 # ~~~~~~~~~~~~~~~END bench-env~~~~~~~~~~~~~~~~~~~~~~~~
