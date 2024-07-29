@@ -1,5 +1,5 @@
 dataset_name: "test"
-window: 1
+window: 10
 
 adj_threshold: 0.1
 
@@ -8,7 +8,7 @@ scale: True
 scaling_axis: "global" # ['channels', 'global']
 scaled_target: True
 
-epochs: 2
+epochs: 100
 samples_per_epoch: 1 # 160 batch of 32
 batch_size: 1
 aggregate_by: ["mean"]
