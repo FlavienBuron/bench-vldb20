@@ -1,5 +1,5 @@
 dataset_name: "test"
-window: 10
+window: 1
 
 adj_threshold: 0.1
 
