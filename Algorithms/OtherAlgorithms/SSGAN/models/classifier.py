@@ -6,7 +6,7 @@ from torch.nn.parameter import Parameter
 import math
 
 SEQ_LEN = 1000
-INPUT_SIZE = 10
+# self.seq_len = 10
 missing_rate = 50
 dataset = "AirQuality"
 SEQ_LEN = 10
@@ -100,29 +100,31 @@ class TemporalDecay(nn.Module):
 
 
 class Classifier(nn.Module):
-    def __init__(self, rnn_hid_size, impute_weight, label_weight):
+    def __init__(self, rnn_hid_size, impute_weight, label_weight, seq_len, ndims):
         super(Classifier, self).__init__()
 
-        self.rnn_hid_size = 64
-        self.impute_weight = torch.tensor(0.3)
-        self.label_weight = torch.tensor(1.0)
+        self.rnn_hid_size = rnn_hid_size
+        self.impute_weight = torch.tensor(impute_weight)
+        self.label_weight = torch.tensor(label_weight)
+        self.seq_len = seq_len
+        self.ndims = ndims
 
         self.build()
 
     def build(self):
-        self.rnn_cell = nn.LSTMCell(INPUT_SIZE, self.rnn_hid_size)
+        self.rnn_cell = nn.LSTMCell(self.seq_len, self.rnn_hid_size)
 
         self.temp_decay_h = TemporalDecay(
-            input_size=INPUT_SIZE, output_size=self.rnn_hid_size, diag=False
+            input_size=self.seq_len, output_size=self.rnn_hid_size, diag=False
         )
         self.temp_decay_x = TemporalDecay(
-            input_size=INPUT_SIZE, output_size=INPUT_SIZE, diag=True
+            input_size=self.seq_len, output_size=self.seq_len, diag=True
         )
 
-        self.hist_reg = nn.Linear(self.rnn_hid_size, INPUT_SIZE)
-        self.feat_reg = FeatureRegression(INPUT_SIZE)
+        self.hist_reg = nn.Linear(self.rnn_hid_size, self.seq_len)
+        self.feat_reg = FeatureRegression(self.seq_len)
 
-        self.weight_combine = nn.Linear(INPUT_SIZE, INPUT_SIZE)
+        self.weight_combine = nn.Linear(self.seq_len, self.seq_len)
 
         self.dropout = nn.Dropout(p=0.25)
         self.out = nn.Linear(self.rnn_hid_size, 1)
@@ -149,7 +151,7 @@ class Classifier(nn.Module):
 
         imputations = []
 
-        for t in range(SEQ_LEN):
+        for t in range(self.seq_len):
             x = values[:, t, :]
             m = masks[:, t, :]
             d = deltas[:, t, :]
