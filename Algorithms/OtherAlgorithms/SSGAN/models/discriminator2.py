@@ -6,17 +6,28 @@ from torch.nn.parameter import Parameter
 import math
 
 SEQ_LEN = 82
-INPUT_SIZE =1
 missing_rate = 50
-dataset = 'AirQuality'
+dataset = "AirQuality"
 dimension = 36
 
-def binary_cross_entropy_with_logits(input, target, weight=None, size_average=True, reduce=True):
+
+def binary_cross_entropy_with_logits(
+    input, target, weight=None, size_average=True, reduce=True
+):
     if not (target.size() == input.size()):
-        raise ValueError("Target size ({}) must be the same as input size ({})".format(target.size(), input.size()))
+        raise ValueError(
+            "Target size ({}) must be the same as input size ({})".format(
+                target.size(), input.size()
+            )
+        )
 
     max_val = (-input).clamp(min=0)
-    loss = input - input * target + max_val + ((-max_val).exp() + (-input - max_val).exp()).log()
+    loss = (
+        input
+        - input * target
+        + max_val
+        + ((-max_val).exp() + (-input - max_val).exp()).log()
+    )
 
     if weight is not None:
         loss = loss * weight
@@ -28,6 +39,7 @@ def binary_cross_entropy_with_logits(input, target, weight=None, size_average=Tr
     else:
         return loss.sum()
 
+
 class FeatureRegression(nn.Module):
     def __init__(self, input_size):
         super(FeatureRegression, self).__init__()
@@ -38,12 +50,12 @@ class FeatureRegression(nn.Module):
         self.b = Parameter(torch.Tensor(input_size))
 
         m = torch.ones(input_size, input_size) - torch.eye(input_size, input_size)
-        self.register_buffer('m', m)
+        self.register_buffer("m", m)
 
         self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.W.size(0))
+        stdv = 1.0 / math.sqrt(self.W.size(0))
         self.W.data.uniform_(-stdv, stdv)
         if self.b is not None:
             self.b.data.uniform_(-stdv, stdv)
@@ -52,8 +64,9 @@ class FeatureRegression(nn.Module):
         z_h = F.linear(x, self.W * Variable(self.m), self.b)
         return z_h
 
+
 class TemporalDecay(nn.Module):
-    def __init__(self, input_size, output_size, diag = False):
+    def __init__(self, input_size, output_size, diag=False):
         super(TemporalDecay, self).__init__()
         self.diag = diag
 
@@ -64,14 +77,14 @@ class TemporalDecay(nn.Module):
         self.b = Parameter(torch.Tensor(output_size))
 
         if self.diag == True:
-            assert(input_size == output_size)
+            assert input_size == output_size
             m = torch.eye(input_size, input_size)
-            self.register_buffer('m', m)
+            self.register_buffer("m", m)
 
         self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.W.size(0))
+        stdv = 1.0 / math.sqrt(self.W.size(0))
         self.W.data.uniform_(-stdv, stdv)
         if self.b is not None:
             self.b.data.uniform_(-stdv, stdv)
@@ -84,39 +97,46 @@ class TemporalDecay(nn.Module):
         gamma = torch.exp(-gamma)
         return gamma
 
+
 class Discriminator(nn.Module):
-    def __init__(self, rnn_hid_size, impute_weight, label_weight):
+    def __init__(self, rnn_hid_size, impute_weight, label_weight, seq_len, ndims):
         super(Discriminator, self).__init__()
 
-        self.rnn_hid_size = 108
-        self.impute_weight = torch.tensor(0.3)
-        self.label_weight = torch.tensor(1.0)
+        self.rnn_hid_size = self.rnn_hid_size
+        self.impute_weight = torch.tensor(self.impute_weight)
+        self.label_weight = torch.tensor(self.label_weight)
         self.reminder_rate = torch.tensor(0)
+        self.seq_len = seq_len
+        self.ndims = ndims
 
         self.build()
 
     def build(self):
-        self.rnn_cell = nn.LSTMCell(INPUT_SIZE, self.rnn_hid_size)
+        self.rnn_cell = nn.LSTMCell(self.ndims * 2, self.rnn_hid_size)
 
-        self.temp_decay_h = TemporalDecay(input_size=INPUT_SIZE, output_size=self.rnn_hid_size, diag = False)
-        self.temp_decay_x = TemporalDecay(input_size=INPUT_SIZE, output_size=INPUT_SIZE, diag = True)
+        self.temp_decay_h = TemporalDecay(
+            input_size=self.ndims, output_size=self.rnn_hid_size, diag=False
+        )
+        self.temp_decay_x = TemporalDecay(
+            input_size=self.ndims, output_size=self.ndims, diag=True
+        )
 
-        self.hist_reg = nn.Linear(self.rnn_hid_size, INPUT_SIZE)
-        self.feat_reg = FeatureRegression(INPUT_SIZE)
+        self.hist_reg = nn.Linear(self.rnn_hid_size, self.ndims)
+        self.feat_reg = FeatureRegression(self.ndims)
 
-        self.weight_combine = nn.Linear(INPUT_SIZE, INPUT_SIZE)
+        self.weight_combine = nn.Linear(self.ndims * 2, self.ndims)
 
         self.dropout = nn.Dropout(p=0.25)
         self.out = nn.Linear(self.rnn_hid_size, 1)
 
     def forward(self, data, direct):
         # Original sequence with 24 time steps
-        values = data[direct]['values']
-        masks = data[direct]['masks']
-        deltas = data[direct]['deltas']
+        values = data[direct]["values"]
+        masks = data[direct]["masks"]
+        deltas = data[direct]["deltas"]
 
-        labels = data['labels'].view(-1, 1)
-        is_train = data['is_train'].view(-1, 1)
+        labels = data["labels"].view(-1, 1)
+        is_train = data["is_train"].view(-1, 1)
 
         h = Variable(torch.zeros((values.size()[0], self.rnn_hid_size)))
         c = Variable(torch.zeros((values.size()[0], self.rnn_hid_size)))
@@ -125,7 +145,7 @@ class Discriminator(nn.Module):
             h, c = h.cuda(), c.cuda()
         x_loss = 0.0
 
-        for t in range(dimension):
+        for t in range(self.seq_len):
             x = values[:, t, :]
             m = masks[:, t, :]
             d = deltas[:, t, :]
@@ -153,8 +173,12 @@ class Discriminator(nn.Module):
         y_loss = binary_cross_entropy_with_logits(y_h, labels, reduce=False)
         y_loss = torch.sum(y_loss * is_train) / (torch.sum(is_train) + 1e-5)
 
-        return {'loss': x_loss * self.impute_weight + y_loss * self.label_weight, 'g_d_loss': y_loss}
+        return {
+            "loss": x_loss * self.impute_weight + y_loss * self.label_weight,
+            "g_d_loss": y_loss,
+        }
 
     def run_on_batch(self, data):
-        ret = self(data, direct='forward')
+        ret = self(data, direct="forward")
         return ret
+

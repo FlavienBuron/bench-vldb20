@@ -100,30 +100,32 @@ class TemporalDecay(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, rnn_hid_size, impute_weight, label_weight):
+    def __init__(self, rnn_hid_size, impute_weight, label_weight, seq_len, ndims):
         super(Discriminator, self).__init__()
 
-        self.rnn_hid_size = 108
-        self.impute_weight = torch.tensor(0.3)
-        self.label_weight = torch.tensor(1.0)
+        self.rnn_hid_size = rnn_hid_size
+        self.impute_weight = torch.tensor(impute_weight)
+        self.label_weight = torch.tensor(label_weight)
         self.reminder_rate = torch.tensor(0)
+        self.seq_len = seq_len
+        self.ndims = ndims
 
         self.build()
 
     def build(self):
-        self.rnn_cell = nn.LSTMCell(INPUT_SIZE, self.rnn_hid_size)
+        self.rnn_cell = nn.LSTMCell(self.ndims * 2, self.rnn_hid_size)
 
         self.temp_decay_h = TemporalDecay(
-            input_size=INPUT_SIZE, output_size=self.rnn_hid_size, diag=False
+            input_size=self.ndims, output_size=self.rnn_hid_size, diag=False
         )
         self.temp_decay_x = TemporalDecay(
-            input_size=INPUT_SIZE, output_size=INPUT_SIZE, diag=True
+            input_size=self.ndims, output_size=self.ndims, diag=True
         )
 
-        self.hist_reg = nn.Linear(self.rnn_hid_size, INPUT_SIZE)
-        self.feat_reg = FeatureRegression(INPUT_SIZE)
+        self.hist_reg = nn.Linear(self.rnn_hid_size, self.ndims)
+        self.feat_reg = FeatureRegression(self.ndims)
 
-        self.weight_combine = nn.Linear(INPUT_SIZE, INPUT_SIZE)
+        self.weight_combine = nn.Linear(self.ndims * 2, self.ndims)
 
         self.dropout = nn.Dropout(p=0.25)
         self.out = nn.Linear(self.rnn_hid_size, 1)
@@ -144,7 +146,7 @@ class Discriminator(nn.Module):
             h, c = h.cuda(), c.cuda()
         x_loss = 0.0
 
-        for t in range(SEQ_LEN):
+        for t in range(self.seq_len):
             x = values[:, t, :]
             m = masks[:, t, :]
             d = deltas[:, t, :]
@@ -180,4 +182,3 @@ class Discriminator(nn.Module):
     def run_on_batch(self, data):
         ret = self(data, direct="forward")
         return ret
-
