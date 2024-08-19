@@ -5,11 +5,11 @@ from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 import math
 
-SEQ_LEN = 1000
-# self.seq_len = 10
+# self.seq_len = 1000
+# self.ndims = 10
 missing_rate = 50
 dataset = "AirQuality"
-SEQ_LEN = 10
+self.seq_len = 10
 
 
 def binary_cross_entropy_with_logits(
@@ -112,19 +112,19 @@ class Classifier(nn.Module):
         self.build()
 
     def build(self):
-        self.rnn_cell = nn.LSTMCell(self.seq_len, self.rnn_hid_size)
+        self.rnn_cell = nn.LSTMCell(self.ndims, self.rnn_hid_size)
 
         self.temp_decay_h = TemporalDecay(
-            input_size=self.seq_len, output_size=self.rnn_hid_size, diag=False
+            input_size=self.ndims, output_size=self.rnn_hid_size, diag=False
         )
         self.temp_decay_x = TemporalDecay(
-            input_size=self.seq_len, output_size=self.seq_len, diag=True
+            input_size=self.ndims, output_size=self.ndims, diag=True
         )
 
-        self.hist_reg = nn.Linear(self.rnn_hid_size, self.seq_len)
-        self.feat_reg = FeatureRegression(self.seq_len)
+        self.hist_reg = nn.Linear(self.rnn_hid_size, self.ndims)
+        self.feat_reg = FeatureRegression(self.ndims)
 
-        self.weight_combine = nn.Linear(self.seq_len, self.seq_len)
+        self.weight_combine = nn.Linear(self.ndims, self.ndims)
 
         self.dropout = nn.Dropout(p=0.25)
         self.out = nn.Linear(self.rnn_hid_size, 1)
