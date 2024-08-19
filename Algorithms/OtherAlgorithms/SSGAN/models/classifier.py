@@ -9,7 +9,7 @@ import math
 # self.ndims = 10
 missing_rate = 50
 dataset = "AirQuality"
-self.seq_len = 10
+# self.seq_len = 10
 
 
 def binary_cross_entropy_with_logits(
@@ -112,7 +112,7 @@ class Classifier(nn.Module):
         self.build()
 
     def build(self):
-        self.rnn_cell = nn.LSTMCell(self.ndims, self.rnn_hid_size)
+        self.rnn_cell = nn.LSTMCell(self.ndims * 2, self.rnn_hid_size)
 
         self.temp_decay_h = TemporalDecay(
             input_size=self.ndims, output_size=self.rnn_hid_size, diag=False
@@ -124,7 +124,7 @@ class Classifier(nn.Module):
         self.hist_reg = nn.Linear(self.rnn_hid_size, self.ndims)
         self.feat_reg = FeatureRegression(self.ndims)
 
-        self.weight_combine = nn.Linear(self.ndims, self.ndims)
+        self.weight_combine = nn.Linear(self.ndims * 2, self.ndims)
 
         self.dropout = nn.Dropout(p=0.25)
         self.out = nn.Linear(self.rnn_hid_size, 1)
