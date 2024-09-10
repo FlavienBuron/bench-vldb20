@@ -13,7 +13,7 @@ from data_prep_tf import prepare_dat
 parser = argparse.ArgumentParser()
 parser.add_argument("--epochs", type=int, default=50)
 parser.add_argument("--model", type=str, default="Based_on_BRITS")  # gru_d, brits
-parser.add_argument("--hid_size", type=int, default=64)
+parser.add_argument("--hid_size", type=int, default=108)
 parser.add_argument("--impute_weight", type=float, default=0.3)
 parser.add_argument("--label_weight", type=float, default=1.0)
 
