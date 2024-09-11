@@ -36,13 +36,14 @@ namespace TestingFramework.AlgoIntegration
         public static readonly Algorithm Pristi = new PriSTIAlgorithm();
         public static readonly Algorithm Grin = new GRINAlgorithm();
         public static readonly Algorithm Ssgan = new SSGANAlgorithm();
+        public static readonly Algorithm Wgan = new WGANAlgorithm();
         
         public static readonly Algorithm MvExport = new MissingValueExportAlgorithm();
 
         //example:
         //    public static readonly Algorithm Example = new ExampleAlgorithm();
         
-        public static Algorithm[] ListAlgorithms = { Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa, Mrnn, Brits, Iim, Deepmvi, Mpin, Pristi, Grin, Ssgan };
+        public static Algorithm[] ListAlgorithms = { Stmvl, CdRec, Tkcm, Spirit, Trmf, Nnmf, Grouse, Svt, SoftImpute, ROSL, DynaMMo, SvdI, MeanImp, LinImp, Ssa, Mrnn, Brits, Iim, Deepmvi, Mpin, Pristi, Grin, Ssgan, Wgan };
         public static Algorithm[] ListAlgorithmsMulticolumn = null;
 
         public const int TypicalTruncation = 3;
@@ -307,6 +308,15 @@ namespace TestingFramework.AlgoIntegration
     {
         public override string AlgCode => "ssgan";
         protected override string _EnvPath => $"{AlgoPack.GlobalAlgorithmsLocation}OtherAlgorithms/SSGAN/";
+        protected override string SubFolderDataIn => "in/";
+        protected override string SubFolderDataOut => "out/";
+        public override bool IsMultiColumn => true;
+    }
+
+    public partial class WGANAlgorithm
+    {
+        public override string AlgCode => "wgan";
+        protected override string _EnvPath => $"{AlgoPack.GlobalAlgorithmsLocation}OtherAlgorithms/WGAN/";
         protected override string SubFolderDataIn => "in/";
         protected override string SubFolderDataOut => "out/";
         public override bool IsMultiColumn => true;
