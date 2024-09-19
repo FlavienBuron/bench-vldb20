@@ -20,11 +20,12 @@ PVLDB 2020 paper: <a href = "http://www.vldb.org/pvldb/vol13/p768-khayati.pdf">M
   - [DeepMVI](http://vldb.org/pvldb/vol14/p2533-bansal.pdf): Missing Value Imputation on Multidimensional Time Series, PVLDB'21
   - [MPIN](https://www.vldb.org/pvldb/vol17/p345-li.pdf): Missing Value Imputation for Multi-attribute Sensor Data Streams via Message Propagation, PVLDB'24
   - [IIM](https://ieeexplore.ieee.org/document/8731351)\*: Learning Individual Models for Imputation, ICDE '19
+  - [PriSTI](https://ieeexplore.ieee.org/document/10184808): PriSTI: A Conditional Diffusion Framework for Spatiotemporal Imputation, ICDE'23
   - [MRNN](https://ieeexplore.ieee.org/document/8485748)\*: Estimating Missing Data in Temporal Data Streams Using Multi-Directional Recurrent Neural Networks, Trans. On Bio Eng.'19
   - [BRITS](http://papers.nips.cc/paper/7911-brits-bidirectional-recurrent-imputation-for-time-series): BRITS: Bidirectional Recurrent Imputation for Time Series, NeurIPS'18
   - [SSA](https://dl.acm.org/doi/10.1145/3287319)\*: Model Agnostic Time Series Analysis via Matrix Estimation, Meas. Anal. Comput. Syst'18
+
 - **Algorithms under Integration**:
-  - [PriSTI](https://ieeexplore.ieee.org/document/10184808): PriSTI: A Conditional Diffusion Framework for Spatiotemporal Imputation, ICDE'23
   - [DAMR](https://dl.acm.org/doi/abs/10.1145/3589333): Dynamic Adjacency Matrix Representation Learning for Multivariate Time Series Imputation, SIGMOD'23
   - [EDIT](https://www.vldb.org/pvldb/vol15/p624-miao.pdf): Efficient and Effective Data Imputation with Influence Functions, PVLDB'23
   - [HKMF-T](https://ieeexplore.ieee.org/document/8979178): HKMF-T: Recover From Blackouts in Tagged Time Series With Hankel Matrix Factorization, TKDE'21
@@ -43,24 +44,17 @@ PVLDB 2020 paper: <a href = "http://www.vldb.org/pvldb/vol13/p768-khayati.pdf">M
 ## Prerequisites
 
 - Ubuntu 20 or Ubuntu 22 (including Ubuntu derivatives, e.g., Xubuntu) or the same distribution under WSL.
-- Clone this repository.
-
+- Clone this repository
 
 ---
 
 ## Build
 - Install mono from https://www.mono-project.com/download/stable/ and reboot your terminal.
 
-- Build the Testing Framework using the installation script located in the root folder (takes several minutes)
+- Build the Testing Framework using the installation script located in the root folder 
 
 ```bash
     $ sh install_linux.sh
-```
-
-- To evaluate the newly integrated algorithms (i.e., SSA, MRNN, BRITS, DeepMVI, and MPIN), please install the following Python packages (takes several minutes):
-
-```bash
-    $ sh install_extra.sh
 ```
 
 <!--- 
@@ -72,7 +66,6 @@ This will install a virtual environment (`bench-env`) under which the packages f
 ## Execution
 
 ```bash
-    $ source bench-env/bin/activate
     $ cd TestingFramework/bin/Debug/
     $ mono TestingFramework.exe [arguments]
 ```
@@ -100,6 +93,13 @@ This will install a virtual environment (`bench-env`) under which the packages f
 | ssa      |             |           |
 | m-rnn    |             |           |
 | brits    |             |           |
+| deepmvi  |             |           |
+| mpin     |             |           |
+| pristi   |             |           |
+| iim      |             |           |
+
+
+
 
 ### Results
 
@@ -165,6 +165,23 @@ All results and plots will be added to the `Results` folder. The accuracy result
 **Remark**: The command `-algx` cannot be executed in a group and thus must precede the name of each algorithm.
 
 ---
+
+## Executing New Algorithms
+
+
+- To evaluate the newly integrated algorithms, please install the following Python packages (takes several minutes):
+
+```bash
+    $ sh install_extra.sh
+```
+
+- Activate the virtual environment and execute the new algorithms from the table above
+
+```bash
+    $ source bench-env/bin/activate
+    $ mono TestingFramework.exe [arguments]
+```
+
 
 ## Extension
 
